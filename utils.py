@@ -3,47 +3,55 @@ from statistics import mode
 import numpy as np
 from scipy.spatial import distance as dist
 import matplotlib.pyplot as plt
-from glob import glob
 import os
-
 import pandas as pd
 import dataframe_image as dfi
 from datetime import datetime
+
 def eye_aspect_ratio(eye):
-    # compute the euclidean distances between the two sets of
-    # vertical eye landmarks (x, y)-coordinates
+    '''
+    This function computes the eye aspect ratio for the eye-blink anti-spoofing technique
+    '''
     A = dist.euclidean(eye[1], eye[5])
     B = dist.euclidean(eye[2], eye[4])
-    # compute the euclidean distance between the horizontal
-    # eye landmark (x, y)-coordinates
     C = dist.euclidean(eye[0], eye[3])
-    # compute the eye aspect ratio
+    
     ear = (A + B) / (2.0 * C)
-    # return the eye aspect ratio
+    
     return ear
+
 def findCosineDistance(source_representation, test_representation):
+    '''
+    This function calculates the  Cosine Distance between two feature vectors
+    '''
     a = np.matmul(np.transpose(source_representation), test_representation)
     b = np.sum(np.multiply(source_representation, source_representation))
     c = np.sum(np.multiply(test_representation, test_representation))
+
     return 1 - (a / (np.sqrt(b) * np.sqrt(c)))
 
 
-def prediction_cosine_similarity2(x_train, y_train, x_test, neigbors):
-    size = np.shape(x_train)[0]  # nombre de vecteurs caracterestique dans le x_train
+def prediction_cosine_similarity2(x_train, y_train, x_test, neighbors):
+    '''
+    This function classifies a new face based on the saved NPY files (x_train, y_train)
+    The neighbor input defines the n closest feature vector for a k-NN classification
+    '''
+    size = np.shape(x_train)[0]  
     distance = []
     sorted_distance = []
     predictions = []
     y_pred = 0
-    for i in range(0, size):  # calcul distance entre x_train et le vecteur a classifier
+
+    for i in range(0, size):  
         d = findCosineDistance(x_train[i], x_test[0])
         distance.append(d)
     sorted_distance = np.sort(distance)
-    print(sorted_distance[0])
+
     if sorted_distance[0] >= 0.2:
         y_pred = np.array(["Not Recognized"])
-        print(y_pred)
+
     else:
-        for j in range(0, neigbors):
+        for j in range(0, neighbors):
             indice = np.where(distance == sorted_distance[j])[0][0]
             predictions.append(y_train[indice])
             try:
@@ -51,17 +59,12 @@ def prediction_cosine_similarity2(x_train, y_train, x_test, neigbors):
             except:
                 indice_nomode = np.where(distance == sorted_distance[0])[0][0]
                 y_pred = y_train[indice_nomode]
-    print(y_pred)
     return y_pred
 
-
-
-
-
-
-
-
 def donutGenerator(path, output_filename):
+    '''
+    This function generates a donuts figures to diplay it in the dashboard view 
+    '''
     auth = np.load(path)
 
     data = np.unique(auth, return_counts=True)[1]

@@ -215,3 +215,55 @@ def reinteger_all(model_name):
     np.save('../gallery/deleted_'+model_name+'_y_train.npy', deleted_y_train)
     
     return None
+
+def delete_personel(model_name,class_name):
+    '''
+    This function deletes a selected personel from the gallery (x_train and y_train)
+    '''
+    
+    if model_name=='vgg16' or model_name=='resnet50': 
+        x_train=np.load('../gallery/'+model_name+'_x_train.npy')
+        y_train=np.load('../gallery/'+model_name+'_y_train.npy')
+    else :
+        print('This {} model is not recognized. The available ones are vgg16 or resnet 50'.format(model_name))
+        return None
+    
+    if class_name in y_train:
+        indexes = np.where(y_train ==class_name)[0]
+    else:
+        print('{} does not exist in the gallery'.format(class_name))
+        return None
+
+    if exists('../gallery/deleted_'+model_name+'_y_train.npy'):
+        deleted_x_train=np.load('../gallery/deleted_'+model_name+'_x_train.npy')
+        deleted_y_train=np.load('../gallery/deleted_'+model_name+'_y_train.npy')
+
+        deleted_x_train = np.concatenate((deleted_x_train,np.expand_dims(x_train[indexes[0]], axis=0)), axis=0)
+        deleted_y_train = np.concatenate((deleted_y_train, np.expand_dims(y_train[indexes[0]], axis=0)), axis=0)
+    else:
+        deleted_x_train= np.array([])
+        deleted_y_train= np.array([])
+
+        deleted_x_train= np.expand_dims(np.append(deleted_x_train, x_train[indexes[0]]), axis=0)
+        deleted_y_train = np.expand_dims(np.append(deleted_y_train, y_train[indexes[0]]), axis=0)
+
+
+    for index in indexes[1:] :
+        feature_to_delete=  np.expand_dims(x_train[index], axis=0)
+        label_to_delete = np.expand_dims(y_train[index], axis=0)
+        deleted_x_train = np.concatenate((deleted_x_train,feature_to_delete), axis=0)
+        deleted_y_train = np.concatenate((deleted_y_train, label_to_delete), axis=0)
+    
+    x_train = np.delete(x_train, indexes, axis=0)
+    y_train = np.delete(y_train, indexes, axis=0)
+
+    np.save('../gallery/deleted_'+model_name+'_x_train.npy', deleted_x_train)
+    np.save('../gallery/deleted_'+model_name+'_y_train.npy', deleted_y_train)
+
+    np.save('../gallery/'+model_name+'_x_train.npy', x_train)
+    np.save('../gallery/'+model_name+'_y_train.npy', y_train)
+
+    print ("The {} {} samples have been deleted with success".format(class_name, model_name.upper()))
+
+    return None
+    

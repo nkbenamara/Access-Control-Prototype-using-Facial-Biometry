@@ -8,6 +8,8 @@ import pandas as pd
 import dataframe_image as dfi
 from datetime import datetime
 
+from os.path import exists
+
 def eye_aspect_ratio(eye):
     '''
     This function computes the eye aspect ratio for the eye-blink anti-spoofing technique
@@ -121,3 +123,95 @@ def generate_report(source_path, data_files, columns_titles, output_type, output
             accepted_output_extensions))
 
     return dataDf
+
+
+def delete_personel(model_name,class_name):
+    '''
+    This function deletes a selected personel from the gallery (x_train and y_train)
+    '''
+    
+    if model_name=='vgg16' or model_name=='resnet50': 
+        x_train=np.load('../gallery/'+model_name+'_x_train.npy')
+        y_train=np.load('../gallery/'+model_name+'_y_train.npy')
+    else :
+        print('This {} model is not recognized. The available ones are vgg16 or resnet 50'.format(model_name))
+        return None
+    
+    if class_name in y_train:
+        indexes = np.where(y_train ==class_name)[0]
+    else:
+        print('{} does not exist in the gallery'.format(class_name))
+        return None
+
+    if exists('../gallery/deleted_'+model_name+'_y_train.npy'):
+        deleted_x_train=np.load('../gallery/deleted_'+model_name+'_x_train.npy')
+        deleted_y_train=np.load('../gallery/deleted_'+model_name+'_y_train.npy')
+
+        deleted_x_train = np.concatenate((deleted_x_train,np.expand_dims(x_train[indexes[0]], axis=0)), axis=0)
+        deleted_y_train = np.concatenate((deleted_y_train, np.expand_dims(y_train[indexes[0]], axis=0)), axis=0)
+    else:
+        deleted_x_train= np.array([])
+        deleted_y_train= np.array([])
+
+        deleted_x_train= np.expand_dims(np.append(deleted_x_train, x_train[indexes[0]]), axis=0)
+        deleted_y_train = np.expand_dims(np.append(deleted_y_train, y_train[indexes[0]]), axis=0)
+
+
+    for index in indexes[1:] :
+        feature_to_delete=  np.expand_dims(x_train[index], axis=0)
+        label_to_delete = np.expand_dims(y_train[index], axis=0)
+        deleted_x_train = np.concatenate((deleted_x_train,feature_to_delete), axis=0)
+        deleted_y_train = np.concatenate((deleted_y_train, label_to_delete), axis=0)
+    
+    x_train = np.delete(x_train, indexes, axis=0)
+    y_train = np.delete(y_train, indexes, axis=0)
+
+    np.save('../gallery/deleted_'+model_name+'_x_train.npy', deleted_x_train)
+    np.save('../gallery/deleted_'+model_name+'_y_train.npy', deleted_y_train)
+
+    np.save('../gallery/'+model_name+'_x_train.npy', x_train)
+    np.save('../gallery/'+model_name+'_y_train.npy', y_train)
+
+    print ("The {} {} samples have been deleted with success".format(class_name, model_name.upper()))
+
+    return None
+    
+def reinteger_all(model_name):
+    '''
+    This function reintegrates all removed collaborators again to the gallery
+    '''
+    
+    if model_name=='vgg16' or model_name=='resnet50': 
+        if not exists('../gallery/deleted_'+model_name+'_y_train.npy'):
+            return print('Any collaborator has been removed previously from the gallery to reintegrate')
+        else:
+            deleted_x_train=np.load('../gallery/deleted_'+model_name+'_x_train.npy')
+            deleted_y_train=np.load('../gallery/deleted_'+model_name+'_y_train.npy')
+            if deleted_y_train.size==0:
+                return print('Any collaborator has been removed previously from the gallery to reintegrate')
+    else :
+        print('This {} model is not recognized. The available ones are vgg16 or resnet 50'.format(model_name))
+        return None
+
+    x_train=np.load('../gallery/'+model_name+'_x_train.npy')
+    y_train=np.load('../gallery/'+model_name+'_y_train.npy')
+
+    x_train=np.concatenate((x_train, deleted_x_train), axis=0)
+    y_train=np.concatenate((y_train, deleted_y_train), axis=0)
+
+    
+
+    np.save('../gallery/'+model_name+'_x_train.npy', x_train)
+    np.save('../gallery/'+model_name+'_y_train.npy', y_train)
+    
+    print('==================================================================================')
+    print('All removed collaborators have been reintegrated to the gallery again with sucess')
+    print('The reintegrated collaborators are :{}'.format(np.unique(deleted_y_train, return_counts=True)[0]))
+    print('==================================================================================')
+
+    deleted_x_train=np.array([])
+    deleted_y_train=np.array([])
+    np.save('../gallery/deleted_'+model_name+'_x_train.npy', deleted_x_train)
+    np.save('../gallery/deleted_'+model_name+'_y_train.npy', deleted_y_train)
+    
+    return None

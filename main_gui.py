@@ -283,7 +283,7 @@ QMenu::item::selected
 
         self.capture = cv2.VideoCapture(0)
         #delete_personel("vgg16", "Djamel Hemch")
-        reinteger_all("vgg16")
+        #reinteger_all("vgg16")
 
 
         ###-------------------Methods - START - -------------###
@@ -418,7 +418,7 @@ QMenu::item::selected
         vgg_face_model = VGGFace(model='vgg16', include_top=False, input_shape=(224, 224, 3), pooling='avg')
         face_cascade = cv2.CascadeClassifier('haarcascade_frontalface_default.xml')
         ret, frame = self.capture.read()
-        path = 'face_img/'
+        path = './face_img/'
         N = 5
         addon = ''.join(random.choices(string.ascii_uppercase +  string.digits, k = N))
         image_list = []
@@ -438,19 +438,20 @@ QMenu::item::selected
                 pass
             ts = 0
             found = None
-            q1 = queue.LifoQueue()
+
+            os.getcwd()
             #Fething the face images captured
-            for file_name in glob("C:/Users/tekmo/Desktop/Stage_EXIA_Djamel_A4/darkflow/app/face_img/*.jpg"):
+            for file_name in glob("./face_img/*.jpg"):
                 fts = os.path.getmtime(file_name)
-                q1.put(file_name)
-                #puts them in a Lifo Queue
+                print(fts)
+
                 if fts > ts:
                     ts = fts
                     found = file_name
                     #Getting the latest captured face image and prints it
 
-            x_train = np.load("C:/Users/tekmo/Desktop/Stage_EXIA_Djamel_A4/darkflow/app/gallery/vgg16_x-train.npy")
-            y_train = np.load("C:/Users/tekmo/Desktop/Stage_EXIA_Djamel_A4/darkflow/app/gallery/vgg16_y-train.npy")
+            x_train = np.load(PATH+"vgg16_x-train.npy")
+            y_train = np.load(PATH+"vgg16_y-train.npy")
             last_image = found
 
             roi_color = cv2.resize(roi_color, (224, 224),interpolation= cv2.INTER_AREA)  # load an image and resize it to 224,224 like vgg face input size
@@ -459,12 +460,12 @@ QMenu::item::selected
             roi_color = utils.preprocess_input(roi_color, version= 1)  # preprocess the image 1 = vggface resnet = 2)
             feature_vector = vgg_face_model.predict(roi_color)  # extract the features
             face_prediction = prediction_cosine_similarity2(x_train, y_train, feature_vector, 5)[0]
-            authorized = np.load("C:/Users/tekmo/Desktop/Stage_EXIA_Djamel_A4/darkflow/app/gallery/authorized.npy")
-            access_history = np.load("C:/Users/tekmo/Desktop/Stage_EXIA_Djamel_A4/darkflow/app/gallery/access_history.npy")
-            accesstime_history= np.load("C:/Users/tekmo/Desktop/Stage_EXIA_Djamel_A4/darkflow/app/gallery/accesstime_history.npy")
-            class_history = np.load("C:/Users/tekmo/Desktop/Stage_EXIA_Djamel_A4/darkflow/app/gallery/class_access_history.npy")
-            date_access = np.load("C:/Users/tekmo/Desktop/Stage_EXIA_Djamel_A4/darkflow/app/gallery/date_access.npy")
-            time_access = np.load("C:/Users/tekmo/Desktop/Stage_EXIA_Djamel_A4/darkflow/app/gallery/time_access.npy")
+            authorized = np.load(PATH+"authorized.npy")
+            access_history = np.load(PATH+"access_history.npy")
+            accesstime_history= np.load(PATH+"accesstime_history.npy")
+            class_history = np.load(PATH+"class_access_history.npy")
+            date_access = np.load(PATH+"date_access.npy")
+            time_access = np.load(PATH+"time_access.npy")
             timing = datetime.now()
             starting_worktime= datetime(timing.year, timing.month, timing.day, 8, 0, 0)
             ending_worktime = datetime(timing.year, timing.month, timing.day, 18, 0, 0)
@@ -492,12 +493,9 @@ QMenu::item::selected
                 date_access = np.append(date_access, str(timing.year) +"-" + str(timing.month) +"-"+str(timing.day))
                 time_access = np.append(time_access, str(timing.hour) +':' + str(timing.minute) +":"+str(timing.second))
 
-                print(time_access)
-                print(date_access)
                 print("Authorized!")
                 self.history.setText(str(face_prediction) + ": Is Authorized")
-                self.history.setStyleSheet("color: green;""border: 1px solid white;"
-                                     "font-style:bold;")
+                self.history.setStyleSheet("color: green;""border: 1px solid white;""font-style:bold;")
             else:
                 #deny
                 if timing > starting_worktime and timing < ending_worktime:
@@ -510,16 +508,12 @@ QMenu::item::selected
                 date_access = np.append(date_access, str(timing.year) + "-" + str(timing.month) + "-" + str(timing.day))
                 time_access = np.append(time_access, str(timing.hour) + ':' + str(timing.minute) + ':' + str(timing.second))
                 self.history.setText(str(face_prediction) + ": Is Unauthorized")
-                self.history.setStyleSheet("color: red;""border: 1px solid white;"
-                                     "font-style:bold;")
-                print(time_access)
-                print(date_access)
-            np.save("C:/Users/tekmo/Desktop/Stage_EXIA_Djamel_A4/darkflow/app/gallery/access_history.npy",access_history)
-            np.save("C:/Users/tekmo/Desktop/Stage_EXIA_Djamel_A4/darkflow/app/gallery/accessTime_history.npy",accesstime_history)
-            np.save("C:/Users/tekmo/Desktop/Stage_EXIA_Djamel_A4/darkflow/app/gallery/class_access_history.npy", class_history)
-            np.save("C:/Users/tekmo/Desktop/Stage_EXIA_Djamel_A4/darkflow/app/gallery/date_access.npy", date_access)
-            np.save("C:/Users/tekmo/Desktop/Stage_EXIA_Djamel_A4/darkflow/app/gallery/time_access.npy", time_access)
-            print(class_history)
+                self.history.setStyleSheet("color: red;""border: 1px solid white;" "font-style:bold;")
+            np.save(PATH+"access_history.npy",access_history)
+            np.save(PATH+"accessTime_history.npy",accesstime_history)
+            np.save(PATH+"class_access_history.npy", class_history)
+            np.save(PATH+"date_access.npy", date_access)
+            np.save(PATH+"time_access.npy", time_access)
             print("Last item : " + str(last_image))
             input_img = cv2.imread(str(last_image))
             height, width, channel = input_img.shape

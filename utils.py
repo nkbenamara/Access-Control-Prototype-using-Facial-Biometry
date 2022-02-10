@@ -1,5 +1,4 @@
 from statistics import mode
-
 import numpy as np
 from scipy.spatial import distance as dist
 import matplotlib.pyplot as plt
@@ -132,8 +131,8 @@ def delete_personel(model_name,class_name):
     '''
     
     if model_name=='vgg16' or model_name=='resnet50': 
-        x_train=np.load('../gallery/'+model_name+'_x_train.npy')
-        y_train=np.load('../gallery/'+model_name+'_y_train.npy')
+        x_train=np.load(GALLERY_PATH+model_name+'_x_train.npy')
+        y_train=np.load(GALLERY_PATH+model_name+'_y_train.npy')
     else :
         print('This {} model is not recognized. The available ones are vgg16 or resnet 50'.format(model_name))
         return None
@@ -144,9 +143,9 @@ def delete_personel(model_name,class_name):
         print('{} does not exist in the gallery'.format(class_name))
         return None
 
-    if exists('../gallery/deleted_'+model_name+'_y_train.npy'):
-        deleted_x_train=np.load('../gallery/deleted_'+model_name+'_x_train.npy')
-        deleted_y_train=np.load('../gallery/deleted_'+model_name+'_y_train.npy')
+    if exists(GALLERY_PATH+'deleted_'+model_name+'_y_train.npy'):
+        deleted_x_train=np.load(GALLERY_PATH+'deleted_'+model_name+'_x_train.npy')
+        deleted_y_train=np.load(GALLERY_PATH+'deleted_'+model_name+'_y_train.npy')
 
         deleted_x_train = np.concatenate((deleted_x_train,np.expand_dims(x_train[indexes[0]], axis=0)), axis=0)
         deleted_y_train = np.concatenate((deleted_y_train, np.expand_dims(y_train[indexes[0]], axis=0)), axis=0)
@@ -167,11 +166,11 @@ def delete_personel(model_name,class_name):
     x_train = np.delete(x_train, indexes, axis=0)
     y_train = np.delete(y_train, indexes, axis=0)
 
-    np.save('../gallery/deleted_'+model_name+'_x_train.npy', deleted_x_train)
-    np.save('../gallery/deleted_'+model_name+'_y_train.npy', deleted_y_train)
+    np.save(GALLERY_PATH+'deleted_'+model_name+'_x_train.npy', deleted_x_train)
+    np.save(GALLERY_PATH+'deleted_'+model_name+'_y_train.npy', deleted_y_train)
 
-    np.save('../gallery/'+model_name+'_x_train.npy', x_train)
-    np.save('../gallery/'+model_name+'_y_train.npy', y_train)
+    np.save(GALLERY_PATH+model_name+'_x_train.npy', x_train)
+    np.save(GALLERY_PATH+model_name+'_y_train.npy', y_train)
 
     print ("The {} {} samples have been deleted with success".format(class_name, model_name.upper()))
 
@@ -183,27 +182,27 @@ def reinteger_all(model_name):
     '''
     
     if model_name=='vgg16' or model_name=='resnet50': 
-        if not exists('../gallery/deleted_'+model_name+'_y_train.npy'):
+        if not exists(GALLERY_PATH+'deleted_'+model_name+'_y_train.npy'):
             return print('Any collaborator has been removed previously from the gallery to reintegrate')
         else:
-            deleted_x_train=np.load('../gallery/deleted_'+model_name+'_x_train.npy')
-            deleted_y_train=np.load('../gallery/deleted_'+model_name+'_y_train.npy')
+            deleted_x_train=np.load(GALLERY_PATH+'deleted_'+model_name+'_x_train.npy')
+            deleted_y_train=np.load(GALLERY_PATH+'deleted_'+model_name+'_y_train.npy')
             if deleted_y_train.size==0:
                 return print('Any collaborator has been removed previously from the gallery to reintegrate')
     else :
         print('This {} model is not recognized. The available ones are vgg16 or resnet 50'.format(model_name))
         return None
 
-    x_train=np.load('../gallery/'+model_name+'_x_train.npy')
-    y_train=np.load('../gallery/'+model_name+'_y_train.npy')
+    x_train=np.load(GALLERY_PATH+model_name+'_x_train.npy')
+    y_train=np.load(GALLERY_PATH+model_name+'_y_train.npy')
 
     x_train=np.concatenate((x_train, deleted_x_train), axis=0)
     y_train=np.concatenate((y_train, deleted_y_train), axis=0)
 
     
 
-    np.save('../gallery/'+model_name+'_x_train.npy', x_train)
-    np.save('../gallery/'+model_name+'_y_train.npy', y_train)
+    np.save(GALLERY_PATH+model_name+'_x_train.npy', x_train)
+    np.save(GALLERY_PATH+model_name+'_y_train.npy', y_train)
     
     print('==================================================================================')
     print('All removed collaborators have been reintegrated to the gallery again with sucess')
@@ -212,8 +211,8 @@ def reinteger_all(model_name):
 
     deleted_x_train=np.array([])
     deleted_y_train=np.array([])
-    np.save('../gallery/deleted_'+model_name+'_x_train.npy', deleted_x_train)
-    np.save('../gallery/deleted_'+model_name+'_y_train.npy', deleted_y_train)
+    np.save(GALLERY_PATH+'deleted_'+model_name+'_x_train.npy', deleted_x_train)
+    np.save(GALLERY_PATH+'deleted_'+model_name+'_y_train.npy', deleted_y_train)
     
     return None
 
@@ -223,8 +222,8 @@ def delete_personel(model_name,class_name):
     '''
     
     if model_name=='vgg16' or model_name=='resnet50': 
-        x_train=np.load('../gallery/'+model_name+'_x_train.npy')
-        y_train=np.load('../gallery/'+model_name+'_y_train.npy')
+        x_train=np.load(GALLERY_PATH+model_name+'_x_train.npy')
+        y_train=np.load(GALLERY_PATH+model_name+'_y_train.npy')
     else :
         print('This {} model is not recognized. The available ones are vgg16 or resnet 50'.format(model_name))
         return None
@@ -235,9 +234,9 @@ def delete_personel(model_name,class_name):
         print('{} does not exist in the gallery'.format(class_name))
         return None
 
-    if exists('../gallery/deleted_'+model_name+'_y_train.npy'):
-        deleted_x_train=np.load('../gallery/deleted_'+model_name+'_x_train.npy')
-        deleted_y_train=np.load('../gallery/deleted_'+model_name+'_y_train.npy')
+    if exists(GALLERY_PATH+'deleted_'+model_name+'_y_train.npy'):
+        deleted_x_train=np.load(GALLERY_PATH+'deleted_'+model_name+'_x_train.npy')
+        deleted_y_train=np.load(GALLERY_PATH+'deleted_'+model_name+'_y_train.npy')
 
         deleted_x_train = np.concatenate((deleted_x_train,np.expand_dims(x_train[indexes[0]], axis=0)), axis=0)
         deleted_y_train = np.concatenate((deleted_y_train, np.expand_dims(y_train[indexes[0]], axis=0)), axis=0)
@@ -258,13 +257,24 @@ def delete_personel(model_name,class_name):
     x_train = np.delete(x_train, indexes, axis=0)
     y_train = np.delete(y_train, indexes, axis=0)
 
-    np.save('../gallery/deleted_'+model_name+'_x_train.npy', deleted_x_train)
-    np.save('../gallery/deleted_'+model_name+'_y_train.npy', deleted_y_train)
+    np.save(GALLERY_PATH+'deleted_'+model_name+'_x_train.npy', deleted_x_train)
+    np.save(GALLERY_PATH+'deleted_'+model_name+'_y_train.npy', deleted_y_train)
 
-    np.save('../gallery/'+model_name+'_x_train.npy', x_train)
-    np.save('../gallery/'+model_name+'_y_train.npy', y_train)
+    np.save(GALLERY_PATH+model_name+'_x_train.npy', x_train)
+    np.save(GALLERY_PATH+model_name+'_y_train.npy', y_train)
 
     print ("The {} {} samples have been deleted with success".format(class_name, model_name.upper()))
 
     return None
-    
+
+def load_actual_collaborators(model_name):
+    '''
+    This function shows all available collaborators in the gallery
+    '''
+    if model_name=='vgg16' or model_name=='resnet50': 
+        y_train=np.load(GALLERY_PATH+model_name+'_y_train.npy')
+    else:
+        print('This {} model is not recognized. The available ones are vgg16 or resnet 50'.format(model_name))
+        return None
+    y_train = np.unique(y_train, return_counts=True) 
+    return y_train[0]

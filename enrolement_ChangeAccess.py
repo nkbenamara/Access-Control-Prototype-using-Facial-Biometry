@@ -2,7 +2,7 @@
 import numpy
 from PyQt5 import QtCore, QtGui, QtWidgets
 import shutil
-
+import cv2
 from PyQt5.QtCore import QSize, QRect
 from PyQt5.QtWidgets import *
 from PyQt5.QtGui import QPixmap, QImage, QCursor, QIcon, QFont
@@ -171,14 +171,14 @@ class Ui_enrolement_ChangeAccess(object):
         self.remove_access.clicked.connect(self.Remove)
     def editPersonnel(self):
         person = self.comboBox.currentText()
-        rand_pic = random.randrange(0, 50)
-        path = self.CURRENT_PATH + "/dataset_cropped/"+ person +"/{}.jpg".format(rand_pic)
+        path=glob(self.CURRENT_PATH + "/dataset_cropped/"+ person +"/*")[0]
+        
         print(path)
         face_img = cv2.imread(path)
         height, width, channel = face_img.shape
         step = channel * width
-        y_train = np.load('./gallery/vgg16_y-train.npy')
-        authorizations = np.load('./gallery/authorized.npy')
+        y_train = np.load(GALLERY_PATH+'vgg16_y_train.npy')
+        authorizations = np.load(HISTORY_PATH+'authorized.npy')
         if os.path.isdir(path) == False:
             print("user not selected")
             self.autorization_label.setText("Please select a user!")
@@ -213,10 +213,10 @@ class Ui_enrolement_ChangeAccess(object):
 
     def Grant(self):
         person = self.comboBox.currentText()
-        authorizations = np.load('./gallery/authorized.npy')
+        authorizations = np.load(HISTORY_PATH+'authorized.npy')
         authorizations = np.append(authorizations, str(person))
         print(authorizations)
-        np.save('./gallery/authorized.npy', authorizations)
+        np.save(HISTORY_PATH+'authorized.npy', authorizations)
         self.autorization_label.setText("Authorizations for {} has been changed".format(person) + '\n' + ": This person is now AUTHORIZED!" +'\n')
         self.autorization_label.setStyleSheet("color: #03DAC6;"
                                               "font-size: 35px;"
@@ -226,12 +226,12 @@ class Ui_enrolement_ChangeAccess(object):
 
     def Remove(self):
         person = self.comboBox.currentText()
-        authorizations = np.load('./gallery/authorized.npy')
+        authorizations = np.load(HISTORY_PATH+'authorized.npy')
         index = np.where(authorizations == person)[0]
         print(index)
         if person in authorizations:
             authorizations = np.delete(authorizations, index)
-            np.save('./gallery/authorized.npy', authorizations)
+            np.save(HISTORY_PATH+'authorized.npy', authorizations)
             self.autorization_label.setText("Authorizations for {} has been changed".format(person) + '\n' + ": This person is now !UNAUTHORIZED!"+'\n')
             self.autorization_label.setStyleSheet("color: #CF6679;"
                                                   "font-size: 35px;"

@@ -9,6 +9,7 @@ import dataframe_image as dfi
 from datetime import datetime
 
 from os.path import exists
+from paths import *
 
 def eye_aspect_ratio(eye):
     '''

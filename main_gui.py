@@ -400,10 +400,11 @@ QMenu::item::selected
             gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
 
             try:
-                faces = face_cascade.detectMultiScale(gray, 1.3, 5)
-                for (x, y, w, h) in faces:
+                rects = detector(gray, 0)
+                for rect in rects:
+                    x,y,w,h= convert_and_trim_bb(gray, rect)
                     roi_color = frame[y:y + h, x:x + w]
-                    captured_img = cv2.imwrite(GALLERY_IMAGES_PATH + "frame-{}.jpg".format(addon)  , roi_color)
+                    cv2.imwrite(GALLERY_IMAGES_PATH + "frame-{}.jpg".format(addon)  , roi_color)
 
             except:
                 pass
@@ -496,8 +497,6 @@ QMenu::item::selected
             qImg = QImage(input_img.data, width, height, step, QImage.Format_RGB888)
 
             self.face_frame.setPixmap(QPixmap.fromImage(qImg))
-            #self.history.setText("Captured face class : " + str(face_prediction) + "\n")
-            #self.history.setText('Captured image attributes : ' + '\n' +'\n'  +str(gray) +  'Image : ' + '\n' + str(last_image) )
             self.history.setAlignment(QtCore.Qt.AlignLeft)
         self.viewCam(0)
 

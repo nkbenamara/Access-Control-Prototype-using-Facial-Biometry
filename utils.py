@@ -10,6 +10,26 @@ from datetime import datetime
 from os.path import exists
 from paths import *
 
+def convert_and_trim_bb(image, rect):
+	'''
+    This function convert dlib rectangle to x,y,h,w coordinates
+    '''
+	startX = rect.left()
+	startY = rect.top()
+	endX = rect.right()
+	endY = rect.bottom()
+	# ensure the bounding box coordinates fall within the spatial
+	# dimensions of the image
+	startX = max(0, startX)
+	startY = max(0, startY)
+	endX = min(endX, image.shape[1])
+	endY = min(endY, image.shape[0])
+	# compute the width and height of the bounding box
+	w = endX - startX
+	h = endY - startY
+	# return our bounding box coordinates
+	return (startX, startY, w, h)
+
 def eye_aspect_ratio(eye):
     '''
     This function computes the eye aspect ratio for the eye-blink anti-spoofing technique

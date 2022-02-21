@@ -1,4 +1,4 @@
-import numpy
+
 from enrolement_addNew import Ui_enrolement_addNew
 from enrolement_ChangeAccess import Ui_enrolement_ChangeAccess
 from dashboard import Ui_Dashboard_Ui
@@ -7,30 +7,23 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtWidgets import *
 from PyQt5.QtGui import QPixmap, QImage, QCursor, QIcon, QFont
 from PyQt5.QtWidgets import QToolTip
-from tqdm import tqdm
+
 import sys
 from datetime import datetime
 import os
 import cv2
-import pandas
 import random
 import string
-import os
 from glob import glob
 import numpy as np
-
-#import pycuda.autoinit
 import time
-import queue
 from tensorflow.keras.preprocessing.image import load_img,img_to_array
-from keras_vggface.vggface import VGGFace
 from keras_vggface import utils
-from utils import prediction_cosine_similarity2, eye_aspect_ratio, delete_personel, reinteger_all
-import dlib
-from imutils import face_utils
-from scipy.spatial import distance as dist
+from utils import prediction_cosine_similarity2, eye_aspect_ratio, delete_personel, reinteger_all, convert_and_trim_bb
 
+from imutils import face_utils
 from paths import *
+from models import *
 
 enrol = Ui_enrolement_addNew()
 
@@ -312,14 +305,10 @@ QMenu::item::selected
         self.COUNTER = 0
         frame_rate = 10
         prev = 0
-        self.face_cascade = cv2.CascadeClassifier(FACE_DETECTION_MODELS+'haarcascade_frontalface_default.xml')
-        self.eye_cascade = cv2.CascadeClassifier(EYE_DETECTION_MODELS+'haarcascade_eye.xml')
-        self.detector = dlib.get_frontal_face_detector()
-        self.predictor = dlib.shape_predictor(FACE_DETECTION_MODELS+ "shape_predictor_68_face_landmarks.dat")
+        
+        
         (lStart, lEnd) = face_utils.FACIAL_LANDMARKS_IDXS["left_eye"]
         (rStart, rEnd) = face_utils.FACIAL_LANDMARKS_IDXS["right_eye"]
-        #self.left_eye = face_utils.FACIAL_LANDMARKS_IDXS["left_eye"]
-        #self.right_eye= face_utils.FACIAL_LANDMARKS_IDXS["right_eye"]
 
         while True:
             stime = time.time()
@@ -330,62 +319,59 @@ QMenu::item::selected
                 prev = time.time()
 
             gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
-            rects = self.detector(gray, 0)
+            rects = detector(gray, 0)
+            
             image= cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
 
-            faces = self.face_cascade.detectMultiScale(gray)
+            
             height, width, channel = image.shape
             step = channel * width
 
             qImg = QImage(image.data, width, height, step, QImage.Format_RGB888)
 
             # Draw a rectangle around the faces
-            for (x, y, w, h) in faces:
-                # comparer mon vecteur avec mon embedding
+            for rect in rects:
+                x,y,w,h= convert_and_trim_bb(gray, rect) 
                 cv2.rectangle(image, (x, y), (x + w, y + h), (255, 0, 0), 2)
-                roi_gray = frame[y:y + h, x:x + w]
-                roi_color = image[y:y + h, x:x + w]
-                eyes = self.eye_cascade.detectMultiScale(roi_gray)#detect eyes inside face rectangle
-                for rect in rects:
 
-                    shape = self.predictor(gray, rect)
-                    shape = face_utils.shape_to_np(shape)
+                shape = predictor(gray, rect)
+                shape = face_utils.shape_to_np(shape)
 
-                    leftEye = shape[lStart:lEnd]
-                    rightEye = shape[rStart:rEnd]
-                    leftEAR = eye_aspect_ratio(leftEye)
-                    rightEAR = eye_aspect_ratio(rightEye)
+                leftEye = shape[lStart:lEnd]
+                rightEye = shape[rStart:rEnd]
+                leftEAR = eye_aspect_ratio(leftEye)
+                rightEAR = eye_aspect_ratio(rightEye)
 
-                    ear = (leftEAR + rightEAR) / 2.0
+                ear = (leftEAR + rightEAR) / 2.0
 
-                    leftEyeHull = cv2.convexHull(leftEye)
-                    rightEyeHull = cv2.convexHull(rightEye)
-                    cv2.drawContours(image, [leftEyeHull], -1, (0, 255, 0), 1)
-                    cv2.drawContours(image, [rightEyeHull], -1, (0, 255, 0), 1)
+                leftEyeHull = cv2.convexHull(leftEye)
+                rightEyeHull = cv2.convexHull(rightEye)
+                cv2.drawContours(image, [leftEyeHull], -1, (0, 255, 0), 1)
+                cv2.drawContours(image, [rightEyeHull], -1, (0, 255, 0), 1)
 
-                    if ear < self.EYE_AR_THRESH:
-                        self.COUNTER += 1
-                        time.sleep(0.099)
+                if ear < self.EYE_AR_THRESH:
+                    self.COUNTER += 1
+                    time.sleep(0.099)
 
 
-                    self.blink_count.setText("Blinks: {}".format(self.COUNTER))
-                    #cv2.putText(image, "EAR: {:.2f}".format(ear), (300, 50), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 0, 255),2)
+                self.blink_count.setText("Blinks: {}".format(self.COUNTER))
+                
 
-                if self.anti_spoofing.isChecked():
-                    #print("anti spoofing Enabled")
-                    if self.COUNTER >= 5:
-                        self.take_pic.setEnabled(True)
-                        self.EAR_label.setText("ANTI-SPOOFING PASSED!")
-                        self.EAR_label.setStyleSheet("color: green;")
-                    else:
-                        self.take_pic.setEnabled(False)
-                        self.EAR_label.setText("WAITING FOR ANTI-SPOOFING")
-                        self.EAR_label.setStyleSheet("""color: red;""")
-                else :
-                    #print("anti spoofing disabled")
+            if self.anti_spoofing.isChecked():
+                #print("anti spoofing Enabled")
+                if self.COUNTER >= 5:
                     self.take_pic.setEnabled(True)
-                    self.EAR_label.setText("ANTI-SPOOFING DISABLED!")
-                    self.EAR_label.setStyleSheet("""color: white;""")
+                    self.EAR_label.setText("ANTI-SPOOFING PASSED!")
+                    self.EAR_label.setStyleSheet("color: green;")
+                else:
+                    self.take_pic.setEnabled(False)
+                    self.EAR_label.setText("WAITING FOR ANTI-SPOOFING")
+                    self.EAR_label.setStyleSheet("""color: red;""")
+            else :
+                #print("anti spoofing disabled")
+                self.take_pic.setEnabled(True)
+                self.EAR_label.setText("ANTI-SPOOFING DISABLED!")
+                self.EAR_label.setStyleSheet("""color: white;""")
             self.cam_label.setPixmap(QPixmap.fromImage(qImg))
 
 
@@ -403,8 +389,7 @@ QMenu::item::selected
 
 
     def capture_image(self):
-        vgg_face_model = VGGFace(model='vgg16', include_top=False, input_shape=(224, 224, 3), pooling='avg')
-        face_cascade = cv2.CascadeClassifier(FACE_DETECTION_MODELS+'haarcascade_frontalface_default.xml')
+        
         ret, frame = self.capture.read()
         N = 5
         addon = ''.join(random.choices(string.ascii_uppercase +  string.digits, k = N))

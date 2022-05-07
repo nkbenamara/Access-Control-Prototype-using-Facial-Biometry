@@ -161,9 +161,7 @@ QMenu::item::selected
         self.menuFace_recognition = QtWidgets.QMenu(self.menubar)
         self.menuFace_recognition.setObjectName("menuFace_recognition")
         MainWindow.setMenuBar(self.menubar)
-        self.statusbar = QtWidgets.QStatusBar(MainWindow)
-        self.statusbar.setObjectName("statusbar")
-        MainWindow.setStatusBar(self.statusbar)
+
         self.actionAjouter_personne = QtWidgets.QAction(MainWindow)
         self.actionAjouter_personne.setObjectName("actionAjouter_personne")
 
@@ -200,9 +198,7 @@ QMenu::item::selected
         self.menuLanguage.setObjectName("menuLanguage")
 
         MainWindow.setMenuBar(self.menubar)
-        self.statusbar = QtWidgets.QStatusBar(MainWindow)
-        self.statusbar.setObjectName("statusbar")
-        MainWindow.setStatusBar(self.statusbar)
+
         self.anti_spoofing = QtWidgets.QAction(MainWindow)
         self.anti_spoofing.setObjectName("antispoofing")
         self.anti_spoofing.setCheckable(True)

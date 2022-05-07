@@ -69,9 +69,7 @@ class Ui_Dashboard_Ui(object):
         self.menubar.setGeometry(QtCore.QRect(0, 0, 800, 21))
         self.menubar.setObjectName("menubar")
         Dashboard_Ui.setMenuBar(self.menubar)
-        self.statusbar = QtWidgets.QStatusBar(Dashboard_Ui)
-        self.statusbar.setObjectName("statusbar")
-        Dashboard_Ui.setStatusBar(self.statusbar)
+  
         ######menu##
         self.menubar = QtWidgets.QMenuBar(Dashboard_Ui)
         self.menubar.setGeometry(QtCore.QRect(0, 0, 800, 21))
@@ -119,9 +117,7 @@ class Ui_Dashboard_Ui(object):
         self.menuFace_recognition.addAction(self.start_facerecognition)
         self.menuFace_recognition.triggered[QAction].connect(self.openFaceRecognition)
         Dashboard_Ui.setMenuBar(self.menubar)
-        self.statusbar = QtWidgets.QStatusBar(Dashboard_Ui)
-        self.statusbar.setObjectName("statusbar")
-        Dashboard_Ui.setStatusBar(self.statusbar)
+
         self.actionAjouter_personne = QtWidgets.QAction(Dashboard_Ui)
         self.actionAjouter_personne.setObjectName("actionAjouter_personne")
         self.menuEnrolement.addAction(self.actionAjouter_personne)

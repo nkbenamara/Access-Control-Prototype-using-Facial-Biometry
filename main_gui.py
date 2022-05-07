@@ -1,4 +1,3 @@
-
 from enrolement_addNew import Ui_enrolement_addNew
 from enrolement_ChangeAccess import Ui_enrolement_ChangeAccess
 from dashboard import Ui_Dashboard_Ui
@@ -31,23 +30,40 @@ enrol = Ui_enrolement_addNew()
 
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
+        '''
+        MAIN WINDOW
+        '''
+        #Define Fonts
+        ##Font7
+        font7 = QtGui.QFont()
+        font7.setPointSize(7)
+        ##Font15
+        font15 = QtGui.QFont()
+        font15.setPointSize(15)
+
+        #Main Window
         MainWindow.setObjectName("MainWindow")
         MainWindow.setFixedSize(900, 830)
-        MainWindow.setStyleSheet("background-color: #262626;"
+        MainWindow.setStyleSheet("background-color: #769efe;"
         "color: #FFFFFF;"
         "font-family: Roboto Mono;"
-        "font-size: 18px;")
+        "font-size: 18px;"
+        "border-radius: 15px;")
         MainWindow.setWindowIcon(QIcon("./imgs/exia_logo.jpg"))
-        #menubar
+
+        #Central Widget
         self.centralwidget = QtWidgets.QWidget(MainWindow)
         self.centralwidget.setObjectName("centralwidget")
+
+        #Display Live FPS
         self.show_fps = QtWidgets.QLabel(self.centralwidget)
         self.show_fps.setGeometry(QtCore.QRect(750, 550, 75, 31))
+        
+        #Start Record Button
         self.startBTN = QtWidgets.QPushButton(self.centralwidget)
         self.startBTN.setGeometry(QtCore.QRect(415, 495, 142, 40))
-        font = QtGui.QFont()
-        font.setPointSize(7)
-        self.startBTN.setFont(font)
+  
+        self.startBTN.setFont(font7)
         self.startBTN.setStyleSheet(
                                 "QPushButton::hover"
                              "{"
@@ -62,14 +78,14 @@ class Ui_MainWindow(object):
         self.startBTN.setToolTip("Start Face Recognition")  # Tool tip
         self.startBTN.setCursor(QCursor(QtCore.Qt.PointingHandCursor))
         self.startBTN.setObjectName("startBTN")
-        ####
+        self.startBTN.clicked.connect(self.viewCam)
+        
+        #Stop Record Button
         self.stopBTN = QtWidgets.QPushButton(self.centralwidget)
         self.stopBTN.setObjectName("stopBTN")
         self.stopBTN = QtWidgets.QPushButton(self.centralwidget)
         self.stopBTN.setGeometry(QtCore.QRect(740, 495,142, 40))
-        font = QtGui.QFont()
-        font.setPointSize(7)
-        self.stopBTN.setFont(font)
+        self.stopBTN.setFont(font7)
         self.stopBTN.setStyleSheet(
             "QPushButton::hover"
             "{"
@@ -82,12 +98,12 @@ class Ui_MainWindow(object):
         self.stopBTN.setIconSize(QtCore.QSize(20, 20))
         self.stopBTN.setToolTip("Start Face Recognition")  # Tool tip
         self.stopBTN.setCursor(QCursor(QtCore.Qt.PointingHandCursor))
+        self.stopBTN.clicked.connect(self.stopVideo)
 
+        #Take Picture Button
         self.take_pic = QtWidgets.QPushButton(self.centralwidget)
         self.take_pic.setGeometry(QtCore.QRect(575, 495, 142, 40))
-        font = QtGui.QFont()
-        font.setPointSize(7)
-        self.take_pic.setFont(font)
+        self.take_pic.setFont(font7)
         self.take_pic.setStyleSheet(
             "QPushButton::hover"
             "{"
@@ -104,7 +120,9 @@ class Ui_MainWindow(object):
         self.take_pic.setCursor(QCursor(QtCore.Qt.PointingHandCursor))
         self.take_pic.setObjectName("takePic")
         self.take_pic.setEnabled(False)
+        self.take_pic.clicked.connect(self.capture_image)
 
+        #Camera Live Recording Area
         self.cam_label = QtWidgets.QLabel(self.centralwidget)
         self.cam_label.setGeometry(QtCore.QRect(420, 15, 451, 441))
         self.cam_label.setObjectName("cam_label")
@@ -113,6 +131,19 @@ class Ui_MainWindow(object):
                                      )
         self.cam_label.setAlignment(QtCore.Qt.AlignCenter)
 
+        ##EAR Label Area - Camera Live Area
+        self.EAR_label = QtWidgets.QLabel(self.centralwidget)
+        self.EAR_label.setGeometry(QtCore.QRect(600, 18, 265, 21))
+        self.EAR_label.setObjectName("EAR_label")
+        self.EAR_label.setFont(font15)
+
+        ##Blink Count Area - Camera Live Area
+        self.blink_count = QtWidgets.QLabel(self.centralwidget)
+        self.blink_count.setGeometry(QtCore.QRect(425, 18, 85, 21))
+        self.blink_count.setObjectName("blink_count")
+        self.blink_count.setFont(font15)
+
+        #Taken Picture Area
         self.face_frame = QtWidgets.QLabel(self.centralwidget)
         self.face_frame.setGeometry(QtCore.QRect(30, 20, 360, 400))
         self.face_frame.setObjectName("face_frame")
@@ -122,142 +153,166 @@ class Ui_MainWindow(object):
                        )
         self.face_frame.setAlignment(QtCore.Qt.AlignCenter)
 
+        #Access Authorizations Area
         self.history = QtWidgets.QLabel(self.centralwidget)
         self.history.setGeometry(QtCore.QRect(30, 450, 360, 250))
-        self.history.setObjectName("face_frame")
+        self.history.setObjectName("authorizations")
         self.history.setScaledContents(True)
         self.history.setStyleSheet("border: 1px solid white;"
                                       "font-style:bold;"
                                       )
-        font = QtGui.QFont()
-        font.setPointSize(25)
         self.history.setAlignment(QtCore.Qt.AlignCenter)
 
         MainWindow.setCentralWidget(self.centralwidget)
+        """
+        MENU BAR
+        """
+        #Menu Bar
         self.menubar = QtWidgets.QMenuBar(MainWindow)
         self.menubar.setGeometry(QtCore.QRect(0, 0, 800, 21))
-        self.menubar.setFont(QtGui.QFont('Arial',5))
+        self.menubar.setFont(font7)
 
         self.menubar.setObjectName("menubar")
         self.menubar.setStyleSheet("""
-QMenuBar
-{
-    background-color: #0c0c13 ;
-    color: #999;
-}
-QMenuBar::item
-{
-    font-style: normal;
-    background-color: #0c0c13;
-    color: #f1f1f1 ;
-}
-QMenuBar::item::selected
-{  
-    background-color: #3399cc;
-    color: #fff;
-}
-QMenu
-{   
-    background-color: #3399cc;
-    color: #fff;
-}
-QMenu::item::selected
-{
-    background-color: #000033;
-    color: #999;
-}
- """)
-
-        self.menuDashboard = QtWidgets.QMenu(self.menubar)
-        self.menuDashboard.setObjectName("menuDashboard")
-        self.menuEnrolement = QtWidgets.QMenu(self.menubar)
-        self.menuEnrolement.setObjectName("menuEnrolement")
-        self.menuSettings = QtWidgets.QMenu(self.menubar)
-        self.menuSettings.setObjectName("menuSettings")
+        QMenuBar
+        {
+            background-color: #0c0c13 ;
+            color: #999;
+        }
+        QMenuBar::item
+        {
+            font-style: normal;
+            background-color: #0c0c13;
+            color: #f1f1f1 ;
+        }
+        QMenuBar::item::selected
+        {  
+            background-color: #3399cc;
+            color: #fff;
+        }
+        QMenu
+        {   
+            background-color: #3399cc;
+            color: #fff;
+        }
+        QMenu::item::selected
+        {
+            background-color: #000033;
+            color: #999;
+        }
+        """)
+        #Defining Menu Bar Options
+        ##Face Recognition Menu
         self.menuFace_recognition = QtWidgets.QMenu(self.menubar)
         self.menuFace_recognition.setObjectName("menuFace_recognition")
+
+        ##Enrolement Menu
+        self.menuEnrolement = QtWidgets.QMenu(self.menubar)
+        self.menuEnrolement.setObjectName("menuEnrolement")
+
+        ##Dashboard Menu
+        self.menuDashboard = QtWidgets.QMenu(self.menubar)
+        self.menuDashboard.setObjectName("menuDashboard")
+
+        ##Settings Menu
+        self.menuSettings = QtWidgets.QMenu(self.menubar)
+        self.menuSettings.setObjectName("menuSettings")
+        self.menuSettings.setStyleSheet("""QPushButton{background-color: lightgrey}""")
+
         MainWindow.setMenuBar(self.menubar)
-        self.statusbar = QtWidgets.QStatusBar(MainWindow)
-        self.statusbar.setObjectName("statusbar")
-        MainWindow.setStatusBar(self.statusbar)
+        
+        """
+        ACTIONS - MENU BAR
+        """
+        #Face Recognition Action Option - Menu Bar
+        self.menubar.addAction(self.menuFace_recognition.menuAction())
+
+        #Enrollement Action Option - Menu Bar
+        self.menubar.addAction(self.menuEnrolement.menuAction())
+
+        #Dashboard Action Option - Menu Bar
+        self.menubar.addAction(self.menuDashboard.menuAction())
+
+        #Settings Action Option - Menu Bar
+        self.menubar.addAction(self.menuSettings.menuAction())
+        """
+        ACTIONS - ENROLLEMENT MENU
+        """
+        #Add a Person Action to Enrolement Menu
         self.actionAjouter_personne = QtWidgets.QAction(MainWindow)
         self.actionAjouter_personne.setObjectName("actionAjouter_personne")
         self.actionAjouter_personne.setCheckable(True)
         self.menuEnrolement.addAction(self.actionAjouter_personne)
 
-        self.dashboardWindow = QtWidgets.QAction(MainWindow)
-        self.dashboardWindow.setObjectName("dashboardWindow")
-        self.menuDashboard.addAction(self.dashboardWindow)
-        self.darkMode = QtWidgets.QAction(self.menuSettings)
-        self.darkMode.setObjectName("Dark Mode")
-        self.darkMode.setCheckable(True)
-        # setting default color of button to light-grey
-        self.menuSettings.setStyleSheet("""QPushButton{background-color: lightgrey}""")
-        self.menuSettings.addAction(self.darkMode)
-        self.menuSettings.triggered[QAction].connect(self.changeTheme)
-        self.EAR_label = QtWidgets.QLabel(self.centralwidget)
-        self.EAR_label.setGeometry(QtCore.QRect(600, 18, 265, 21))
-        self.EAR_label.setObjectName("EAR_label")
-        font = QtGui.QFont()
-        font.setPointSize(15)
-        self.EAR_label.setFont(font)
-        self.blink_count = QtWidgets.QLabel(self.centralwidget)
-        self.blink_count.setGeometry(QtCore.QRect(425, 18, 85, 21))
-        self.blink_count.setObjectName("blink_count")
-        font = QtGui.QFont()
-        font.setPointSize(15)
-        self.blink_count.setFont(font)
-        # setting checkable to true
-
-
-        # setting calling method by butto
-
-        self.menubar.addAction(self.menuFace_recognition.menuAction())
-        self.menubar.addAction(self.menuEnrolement.menuAction())
-        self.menubar.addAction(self.menuDashboard.menuAction())
-        self.menuDashboard.triggered[QAction].connect(self.openDashboard)
-        self.menuEnrolement.triggered[QAction].connect(self.enrollment_windows)
-        self.menubar.addAction(self.menuSettings.menuAction())
-        # Create new action
-        self.menuLanguage = QtWidgets.QMenu(self.menuSettings)
-        self.menuLanguage.setObjectName("menuLanguage")
-        self.logs = QtWidgets.QMenu(self.menuSettings)
-        self.logs.setObjectName("menuLanguage")
-        MainWindow.setMenuBar(self.menubar)
-        self.statusbar = QtWidgets.QStatusBar(MainWindow)
-        self.statusbar.setObjectName("statusbar")
-        MainWindow.setStatusBar(self.statusbar)
-        self.anti_spoofing = QtWidgets.QAction(MainWindow)
-        self.anti_spoofing.setObjectName("antispoofing")
-        self.anti_spoofing.setCheckable(True)
-        self.actionEnglish = QtWidgets.QAction(MainWindow)
-        self.actionEnglish.setObjectName("actionEnglish")
-        self.actionEnglish.setCheckable(True)
-        self.actionFran_ais = QtWidgets.QAction(MainWindow)
-        self.actionFran_ais.setObjectName("actionFran_ais")
-        self.actionFran_ais.setCheckable(True)
+        #Add the Change Access Action to Enrolement Menu
         self.removeAccess = QtWidgets.QAction(MainWindow)
         self.removeAccess.setObjectName("removeAccess")
         self.removeAccess.setCheckable(True)
-        self.menuLanguage.addAction(self.actionEnglish)
-        self.menuLanguage.addAction(self.actionFran_ais)
-        self.menuLanguage.triggered[QAction].connect(self.changeLanguage)
-        self.menuSettings.addAction(self.menuLanguage.menuAction())
-        self.menuSettings.addAction(self.anti_spoofing)
-        self.menuSettings.addAction(self.logs.menuAction())
         self.menuEnrolement.addAction(self.removeAccess)
-        self.menubar.addAction(self.menuSettings.menuAction())
+        
+        self.menuEnrolement.triggered[QAction].connect(self.enrollment_windows)
+        """
+        ACTIONS - DASHBOARD MENU
+        """
+        #Dashboard Window Action to Dashboard Menu 
+        self.dashboardWindow = QtWidgets.QAction(MainWindow)
+        self.dashboardWindow.setObjectName("dashboardWindow")
+        self.menuDashboard.addAction(self.dashboardWindow)
+
+        self.menuDashboard.triggered[QAction].connect(self.openDashboard)
+
+        """
+        ACTIONS - SETTINGS MENU
+        """
+        #Add Dark/Light Mode to Settings Menu
+        self.darkMode = QtWidgets.QAction(self.menuSettings)
+        self.darkMode.setObjectName("Dark Mode")
+        self.darkMode.setCheckable(True)
+        self.menuSettings.addAction(self.darkMode)
+
+        self.menuSettings.triggered[QAction].connect(self.changeTheme)
+
+        #Add Menu Language to Settings Menu
+        self.menuLanguage = QtWidgets.QMenu(self.menuSettings)
+        self.menuLanguage.setObjectName("menuLanguage")
+        self.menuSettings.addAction(self.menuLanguage.menuAction())
+        ## Add English Option to Menu Language (Settings Menu)
+        self.actionEnglish = QtWidgets.QAction(MainWindow)
+        self.actionEnglish.setObjectName("actionEnglish")
+        self.actionEnglish.setCheckable(True)
+        self.menuLanguage.addAction(self.actionEnglish)
+        ## Add French Option to Menu Language (Settings Menu)
+        self.actionFrancais = QtWidgets.QAction(MainWindow)
+        self.actionFrancais.setObjectName("actionFrancais")
+        self.actionFrancais.setCheckable(True)
+        self.menuLanguage.addAction(self.actionFrancais)
+
+        self.menuLanguage.triggered[QAction].connect(self.changeLanguage)
+
+        #Add Antispoofing Mode to Setting Menu
+        self.anti_spoofing = QtWidgets.QAction(MainWindow)
+        self.anti_spoofing.setObjectName("antispoofing")
+        self.anti_spoofing.setCheckable(True)
+        self.menuSettings.addAction(self.anti_spoofing)
+
+        #Add Generate Logs Menu to Setting Menu
+        self.logs = QtWidgets.QMenu(self.menuSettings)
+        self.logs.setObjectName("logs")
+        self.menuSettings.addAction(self.logs.menuAction())
+        ## Add PNG Option to Generate Logs Menu (Settings Menu)
         self.logs_png = QtWidgets.QAction(MainWindow)
         self.logs_png.setCheckable(True)
+        self.logs.addAction(self.logs_png)
+        ## Add CSV Option to Generate Logs Menu (Settings Menu)
         self.logs_csv = QtWidgets.QAction(MainWindow)
         self.logs_csv.setCheckable(True)
-        self.logs.addAction(self.logs_png)
         self.logs.addAction(self.logs_csv)
+        
         self.logs.triggered[QAction].connect(self.logsGenerator)
-        self.startBTN.clicked.connect(self.viewCam)
-        self.stopBTN.clicked.connect(self.stopVideo)
+
+
         #self.open_csv.clicked.connect(self.Openfile)
-        self.take_pic.clicked.connect(self.capture_image)
+        
 
         self.retranslateUi(MainWindow)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
@@ -267,7 +322,9 @@ QMenu::item::selected
         #reinteger_all("vgg16")
 
 
-        ###-------------------Methods - START - -------------###
+    """
+    METHODS
+    """
     def openDashboard(self):
         self.window = QtWidgets.QMainWindow()
         self.ui = Ui_Dashboard_Ui()
@@ -587,12 +644,12 @@ QMenu::item::selected
         print("capture stopped")
 
     def changeLanguage(self):
-        if self.actionFran_ais.isChecked():
+        if self.actionFrancais.isChecked():
             print("francais")
             self.actionEnglish.setChecked(False)
         if self.actionEnglish.isChecked():
             print("english")
-            self.actionFran_ais.setChecked(False)
+            self.actionFrancais.setChecked(False)
         #--------------------Methods -END - --------------------#
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate
@@ -617,7 +674,7 @@ QMenu::item::selected
         self.darkMode.setText(_translate("MainWindow", "Enable Light Mod"))
         self.menuLanguage.setTitle(_translate("MainWindow", "Language"))
         self.actionEnglish.setText(_translate("MainWindow", "English"))
-        self.actionFran_ais.setText(_translate("MainWindow", "Français"))
+        self.actionFrancais.setText(_translate("MainWindow", "Français"))
         self.anti_spoofing.setText(_translate("MainWindow", "Anti-Spoofing"))
         self.EAR_label.setText(_translate("MainWindow", ""))
         self.blink_count.setText(_translate("MainWindow", ""))

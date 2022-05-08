@@ -34,21 +34,20 @@ class Ui_MainWindow(object):
         MAIN WINDOW
         '''
         #Define Fonts
-        ##Font7
-        font7 = QtGui.QFont()
-        font7.setPointSize(7)
-        ##Font15
-        font15 = QtGui.QFont()
-        font15.setPointSize(15)
+        QtGui.QFontDatabase.addApplicationFont("./fonts/Play-Regular.ttf")
+        
+        ##Font7 & Font15
+        font7 = QtGui.QFont("Play", 7)
+        font15 = QtGui.QFont("Play",15)
 
         #Main Window
         MainWindow.setObjectName("MainWindow")
         MainWindow.setFixedSize(900, 830)
-        MainWindow.setStyleSheet("background-color: #769efe;"
-        "color: #FFFFFF;"
-        "font-family: Roboto Mono;"
+        MainWindow.setStyleSheet("background-color: #1b1553;"
+        "color: #ff4b3c;"
+        "font-family: Play;"
         "font-size: 18px;"
-        "border-radius: 15px;")
+        "border-radius: 5px;")
         MainWindow.setWindowIcon(QIcon("./imgs/exia_logo.jpg"))
 
         #Central Widget
@@ -111,7 +110,6 @@ class Ui_MainWindow(object):
             "color: black;"
             "}"
             "border: 1px solid white;"
-            "font-family: Roboto Mono"
         )
         self.take_pic.setIcon(QIcon("./imgs/cam.png"))
         self.take_pic.setIconSize(QtCore.QSize(30, 30))
@@ -177,29 +175,34 @@ class Ui_MainWindow(object):
         QMenuBar
         {
             background-color: #0c0c13 ;
-            color: #999;
+            color: #fff;
         }
         QMenuBar::item
         {
-            font-style: normal;
+            font-style: Play;
             background-color: #0c0c13;
-            color: #f1f1f1 ;
+            color: #fff;
+            padding-left : 5px; 
         }
         QMenuBar::item::selected
         {  
-            background-color: #3399cc;
+            background-color: #1b1553;
             color: #fff;
+            
         }
         QMenu
         {   
-            background-color: #3399cc;
+            background-color: #1e0a30;
             color: #fff;
+            padding-left : 5px; 
         }
         QMenu::item::selected
         {
-            background-color: #000033;
-            color: #999;
+            background-color: #1b1553;
+            color: #fff;
+            border : 1px solid #ff4b3c;
         }
+
         """)
         #Defining Menu Bar Options
         ##Face Recognition Menu
@@ -575,7 +578,7 @@ class Ui_MainWindow(object):
             self.menuSettings.setStyleSheet("background-color: #3399cc;")
             MainWindow.setStyleSheet("background-color: #cccccc;"
         "color: #262626;"
-        "font-family: roboto;"
+        "font-family: Play;"
         "font-size: 18px;")
             self.startBTN.setStyleSheet(
                 "QPushButton::hover"
@@ -609,7 +612,7 @@ class Ui_MainWindow(object):
             self.darkMode.setText('Enable Light Mod')
             MainWindow.setStyleSheet("background-color: #262626;"
         "color: #FFFFFF;"
-        "font-family: roboto;"
+        "font-family: Play;"
         "font-size: 18px;")
 
             self.startBTN.setStyleSheet(

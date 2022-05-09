@@ -33,6 +33,7 @@ class Ui_MainWindow(object):
         '''
         MAIN WINDOW
         '''
+        
         #Define Fonts
         QtGui.QFontDatabase.addApplicationFont("./fonts/Play-Regular.ttf")
         
@@ -59,11 +60,11 @@ class Ui_MainWindow(object):
         self.show_fps.setGeometry(QtCore.QRect(750, 550, 75, 31))
         
         #Start Record Button
-        self.startBTN = QtWidgets.QPushButton(self.centralwidget)
-        self.startBTN.setGeometry(QtCore.QRect(415, 495, 142, 40))
+        self.recordBTN = QtWidgets.QPushButton(self.centralwidget)
+        self.recordBTN.setGeometry(QtCore.QRect(500, 495, 142, 40))
   
-        self.startBTN.setFont(font7)
-        self.startBTN.setStyleSheet(
+        self.recordBTN.setFont(font7)
+        self.recordBTN.setStyleSheet(
                                 "QPushButton::hover"
                              "{"
                              "background-color:rgb(255,255,255);"
@@ -71,37 +72,17 @@ class Ui_MainWindow(object):
                              "}"
                             "border: 1px solid white;"
                             )
-        self.startBTN.setIcon(QIcon("./imgs/start.ico"))
-        self.startBTN.setIconSize(QtCore.QSize(20, 20))
-        self.startBTN.setShortcut('Ctrl+R')
-        self.startBTN.setToolTip("Start Face Recognition")  # Tool tip
-        self.startBTN.setCursor(QCursor(QtCore.Qt.PointingHandCursor))
-        self.startBTN.setObjectName("startBTN")
-        self.startBTN.clicked.connect(self.viewCam)
+        self.recordBTN.setIcon(QIcon("./imgs/start.ico"))
+        self.recordBTN.setIconSize(QtCore.QSize(20, 20))
+        self.recordBTN.setShortcut('Ctrl+R')
+        self.recordBTN.setToolTip("Start Face Recognition")  # Tool tip
+        self.recordBTN.setCursor(QCursor(QtCore.Qt.PointingHandCursor))
+        self.recordBTN.setObjectName("recordBTN")
+        self.recordBTN.clicked.connect(self.viewCam)
         
-        #Stop Record Button
-        self.stopBTN = QtWidgets.QPushButton(self.centralwidget)
-        self.stopBTN.setObjectName("stopBTN")
-        self.stopBTN = QtWidgets.QPushButton(self.centralwidget)
-        self.stopBTN.setGeometry(QtCore.QRect(740, 495,142, 40))
-        self.stopBTN.setFont(font7)
-        self.stopBTN.setStyleSheet(
-            "QPushButton::hover"
-            "{"
-            "background-color:rgb(255,255,255);"
-            "color: black;"
-            "}"
-            "border: 1px solid white;"
-        )
-        self.stopBTN.setIcon(QIcon("./imgs/stop-button.png"))
-        self.stopBTN.setIconSize(QtCore.QSize(20, 20))
-        self.stopBTN.setToolTip("Start Face Recognition")  # Tool tip
-        self.stopBTN.setCursor(QCursor(QtCore.Qt.PointingHandCursor))
-        self.stopBTN.clicked.connect(self.stopVideo)
-
         #Take Picture Button
         self.take_pic = QtWidgets.QPushButton(self.centralwidget)
-        self.take_pic.setGeometry(QtCore.QRect(575, 495, 142, 40))
+        self.take_pic.setGeometry(QtCore.QRect(650, 495, 142, 40))
         self.take_pic.setFont(font7)
         self.take_pic.setStyleSheet(
             "QPushButton::hover"
@@ -361,6 +342,12 @@ class Ui_MainWindow(object):
 
 
     def viewCam(self, test):
+        _translate = QtCore.QCoreApplication.translate
+        
+        self.recordBTN.setIcon(QIcon("./imgs/stop.png"))
+        self.recordBTN.setToolTip("Stop Face Recognition")
+        self.recordBTN.setText(_translate("MainWindow", " Stop Capture"))
+
         self.EYE_AR_THRESH = 0.15
         self.COUNTER = 0
         frame_rate = 10
@@ -418,7 +405,6 @@ class Ui_MainWindow(object):
                 
 
             if self.anti_spoofing.isChecked():
-                #print("anti spoofing Enabled")
                 if self.COUNTER >= 5:
                     self.take_pic.setEnabled(True)
                     self.EAR_label.setText("ANTI-SPOOFING PASSED!")
@@ -573,28 +559,61 @@ class Ui_MainWindow(object):
 
     def changeTheme(self):
         if self.darkMode.isChecked():
-            self.darkMode.setText('Disable Light Mod')
+            self.darkMode.setText('Disable Light Mode')
             # setting background color to Light
-            self.menuSettings.setStyleSheet("background-color: #3399cc;")
             MainWindow.setStyleSheet("background-color: #cccccc;"
-        "color: #262626;"
+        "color: #1b1553;"
         "font-family: Play;"
-        "font-size: 18px;")
-            self.startBTN.setStyleSheet(
+        "font-size: 18px;"
+        "border-radius: 5px;")
+            self.menubar.setStyleSheet("""
+        QMenuBar
+        {
+            background-color: #0c0c13 ;
+            color: #fff;
+        }
+        QMenuBar::item
+        {
+            font-style: Play;
+            background-color: #0c0c13;
+            color: #fff;
+            padding-left : 5px; 
+        }
+        QMenuBar::item::selected
+        {  
+            background-color: #1b1553;
+            color: #fff;
+            
+        }
+        QMenu
+        {   
+            background-color: #1e0a30;
+            color: #fff;
+            padding-left : 5px; 
+        }
+        QMenu::item::selected
+        {
+            background-color: #1b1553;
+            color: #fff;
+            border : 1px solid #ff4b3c;
+        }
+
+        """)
+            self.recordBTN.setStyleSheet(
                 "QPushButton::hover"
                 "{"
-                "background-color: #6EE5EE;"
-                "color: black;"
+                "background-color: #1b1553;"
+                "color: #eeeeee;"
                 "}"
-                "border: 1px solid black;"
+                "border: 1px solid #1b1553;"
             )
             self.take_pic.setStyleSheet(
                 "QPushButton::hover"
                 "{"
-                "background-color: #6EE5EE;"
-                "color: black;"
+                "background-color: #1b1553;"
+                "color: #eeeeee;"
                 "}"
-                "border: 1px solid black;"
+                "border: 1px solid #1b1553;"
             )
             self.cam_label.setStyleSheet("border: 1px solid black;"
                                          "font-style:bold;"
@@ -608,14 +627,49 @@ class Ui_MainWindow(object):
             # if it is unchecked
         else:
             # set background color back to dARK
-            self.menuSettings.setStyleSheet("background-color : #3399cc")
-            self.darkMode.setText('Enable Light Mod')
-            MainWindow.setStyleSheet("background-color: #262626;"
-        "color: #FFFFFF;"
+            
+            self.darkMode.setText('Enable Light Mode')
+            MainWindow.setStyleSheet("background-color: #1b1553;"
+        "color: #ff4b3c;"
         "font-family: Play;"
-        "font-size: 18px;")
+        "font-size: 18px;"
+        "border-radius: 5px;")
 
-            self.startBTN.setStyleSheet(
+            self.menubar.setStyleSheet("""
+        QMenuBar
+        {
+            background-color: #0c0c13 ;
+            color: #fff;
+        }
+        QMenuBar::item
+        {
+            font-style: Play;
+            background-color: #0c0c13;
+            color: #fff;
+            padding-left : 5px; 
+        }
+        QMenuBar::item::selected
+        {  
+            background-color: #1b1553;
+            color: #fff;
+            
+        }
+        QMenu
+        {   
+            background-color: #1e0a30;
+            color: #fff;
+            padding-left : 5px; 
+        }
+        QMenu::item::selected
+        {
+            background-color: #1b1553;
+            color: #fff;
+            border : 1px solid #ff4b3c;
+        }
+
+        """)
+
+            self.recordBTN.setStyleSheet(
                 "QPushButton::hover"
                 "{"
                 "background-color:rgb(255,255,255);"
@@ -657,8 +711,7 @@ class Ui_MainWindow(object):
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate
         MainWindow.setWindowTitle(_translate("MainWindow", " FRekoAccess"))
-        self.startBTN.setText(_translate("MainWindow", " Start Capture"))
-        self.stopBTN.setText(_translate("MainWindow", " Stop Capture"))
+        self.recordBTN.setText(_translate("MainWindow", " Start Capture"))
         self.cam_label.setText(_translate("MainWindow", "Camera Capture Frame"))
         self.take_pic.setText(_translate("MainWindow", "Authenticate"))
         self.face_frame.setText(_translate("MainWindow", "Captured image of face"))
@@ -674,7 +727,7 @@ class Ui_MainWindow(object):
         self.actionAjouter_personne.setText(_translate("MainWindow", "New personnel"))
         self.dashboardWindow.setText(_translate("MainWindow", "Open Dashboard"))
         self.show_fps.setText(_translate("MainWindow", ""))
-        self.darkMode.setText(_translate("MainWindow", "Enable Light Mod"))
+        self.darkMode.setText(_translate("MainWindow", "Enable Light Mode"))
         self.menuLanguage.setTitle(_translate("MainWindow", "Language"))
         self.actionEnglish.setText(_translate("MainWindow", "English"))
         self.actionFrancais.setText(_translate("MainWindow", "Français"))

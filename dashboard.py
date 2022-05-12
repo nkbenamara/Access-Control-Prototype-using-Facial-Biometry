@@ -11,13 +11,21 @@ from paths import *
 from utils import donutGenerator
 class Ui_Dashboard_Ui(object):
     def setupUi(self, Dashboard_Ui):
+        '''
+        MAIN WINDOW - DASHBOARD
+        '''
+
+        #Define Fonts
+        QtGui.QFontDatabase.addApplicationFont("./fonts/Play-Regular.ttf")
+
         Dashboard_Ui.setObjectName("Dashboard_Ui")
         Dashboard_Ui.resize(900, 830)
-        Dashboard_Ui.setStyleSheet("background-color: #262626;"
-        "color: #FFFFFF;"
-        "font-family: Titillium;"
-        "font-size: 18px;")
-        Dashboard_Ui.setWindowIcon(QIcon("./imgs/exia_logo.jpg"))
+        Dashboard_Ui.setStyleSheet("background-color: #1b1553;"
+        "color: #ff4b3c;"
+        "font-family: Play;"
+        "font-size: 18px;"
+        "border-radius: 5px;")
+        Dashboard_Ui.setWindowIcon(QIcon("./imgs/logo.jpg"))
         self.centralwidget = QtWidgets.QWidget(Dashboard_Ui)
         self.centralwidget.setObjectName("centralwidget")
         self.class_number = QtWidgets.QLabel(self.centralwidget)

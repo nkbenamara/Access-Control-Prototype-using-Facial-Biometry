@@ -27,13 +27,21 @@ from paths import *
 
 class Ui_enrolement_ChangeAccess(object):
     def setupUi(self, enrolement_ChangeAccess):
+        '''
+        MAIN WINDOW - ENROLEMENT_CHANGEACCESS
+        '''
+
+        #Define Fonts
+        QtGui.QFontDatabase.addApplicationFont("./fonts/Play-Regular.ttf")
+
         enrolement_ChangeAccess.setObjectName("enrolement_ChangeAccess")
         enrolement_ChangeAccess.setFixedSize(900, 830)
-        enrolement_ChangeAccess.setStyleSheet("background-color: #121212;" 
-        "color: #FFFFFF;"
-        "font-family: Titillium;"
-        "font-size: 18px;")
-        enrolement_ChangeAccess.setWindowIcon(QIcon("./imgs/exia_logo.jpg"))
+        enrolement_ChangeAccess.setStyleSheet("background-color: #1b1553;"
+        "color: #ff4b3c;"
+        "font-family: Play;"
+        "font-size: 18px;"
+        "border-radius: 5px;")
+        enrolement_ChangeAccess.setWindowIcon(QIcon("./imgs/logo.jpg"))
 
 
         self.centralwidget = QtWidgets.QWidget(enrolement_ChangeAccess)

@@ -49,7 +49,7 @@ class Ui_MainWindow(object):
         "font-family: Play;"
         "font-size: 18px;"
         "border-radius: 5px;")
-        MainWindow.setWindowIcon(QIcon("./imgs/exia_logo.jpg"))
+        MainWindow.setWindowIcon(QIcon("./imgs/logo.jpg"))
 
         #Central Widget
         self.centralwidget = QtWidgets.QWidget(MainWindow)

@@ -36,13 +36,21 @@ from paths import *
 
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
+        '''
+        MAIN WINDOW - AUTHENTIFICATION
+        '''
+
+        #Define Fonts
+        QtGui.QFontDatabase.addApplicationFont("./fonts/Play-Regular.ttf")
+
         MainWindow.setObjectName("MainWindow")
         MainWindow.resize(900, 830)
-        MainWindow.setStyleSheet("background-color: #262626;"
-        "color: #FFFFFF;"
-        "font-family: Titillium;"
-        "font-size: 18px;")
-        MainWindow.setWindowIcon(QIcon("./imgs/exia_logo.jpg"))
+        MainWindow.setStyleSheet("background-color: #1b1553;"
+        "color: #ff4b3c;"
+        "font-family: Play;"
+        "font-size: 18px;"
+        "border-radius: 5px;")
+        MainWindow.setWindowIcon(QIcon("./imgs/logo.jpg"))
         #menubar
 
 

@@ -11,13 +11,21 @@ import cv2
 
 class Ui_enrolement_ChangeAccess(object):
     def setupUi(self, enrolement_Delete):
+        '''
+        MAIN WINDOW - ENROLEMENT_DELETE
+        '''
+
+        #Define Fonts
+        QtGui.QFontDatabase.addApplicationFont("./fonts/Play-Regular.ttf")
+
         enrolement_Delete.setObjectName("enrolement_ChangeAccess")
         enrolement_Delete.setFixedSize(900, 830)
-        enrolement_Delete.setStyleSheet("background-color: #262626;"
-                                              "color: #FFFFFF;"
-                                              "font-family: Titillium;"
-                                              "font-size: 18px;")
-        enrolement_Delete.setWindowIcon(QIcon("./imgs/exia_logo.jpg"))
+        enrolement_Delete.setStyleSheet("background-color: #1b1553;"
+        "color: #ff4b3c;"
+        "font-family: Play;"
+        "font-size: 18px;"
+        "border-radius: 5px;")
+        enrolement_Delete.setWindowIcon(QIcon("./imgs/logo.jpg"))
 
         self.centralwidget = QtWidgets.QWidget(enrolement_Delete)
         self.centralwidget.setObjectName("centralwidget")

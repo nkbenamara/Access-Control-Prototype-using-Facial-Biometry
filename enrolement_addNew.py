@@ -28,6 +28,7 @@ from keras_vggface import utils
 from utils import prediction_cosine_similarity2, findCosineDistance
 import dlib
 
+from models import *
 from paths import *
 
 class Ui_enrolement_addNew(object):
@@ -44,6 +45,7 @@ class Ui_enrolement_addNew(object):
         font21 = QtGui.QFont("Play", 21)
         font11 = QtGui.QFont("Play", 11)
         font7 = QtGui.QFont("Play", 7)
+        font4 = QtGui.QFont("Play", 4)
 
         #Main Window
         enrolement_addNew.setObjectName("enrolement_addNew")
@@ -69,15 +71,58 @@ class Ui_enrolement_addNew(object):
                                      )
         self.frame.setAlignment(QtCore.Qt.AlignCenter)
         
-        #Taken Picture Area
-        self.face_frames = QtWidgets.QLabel(self.centralwidget)
-        self.face_frames.setGeometry(QtCore.QRect(15, 328, 385, 128 ))
-        self.face_frames.setObjectName("face_frames")
-        self.face_frames.setScaledContents(True)
-        self.face_frames.setStyleSheet("border: 1px solid white;"
+        #Taken Picture Areas
+
+        #Frame 1 (Main Frame)
+        self.face_frame1 = QtWidgets.QLabel(self.centralwidget)
+        self.face_frame1.setGeometry(QtCore.QRect(15, 140, 170, 170 ))
+        self.face_frame1.setObjectName("face_frame1")
+        self.face_frame1.setScaledContents(True)
+        self.face_frame1.setFont(font4)
+        self.face_frame1.setStyleSheet("border: 1px solid white;"
                        "font-style:bold;"
                        )
-        self.face_frames.setAlignment(QtCore.Qt.AlignCenter)
+        self.face_frame1.setAlignment(QtCore.Qt.AlignCenter)
+        #Frame 2 
+        self.face_frame2 = QtWidgets.QLabel(self.centralwidget)
+        self.face_frame2.setGeometry(QtCore.QRect(15, 371, 85, 85 ))
+        self.face_frame2.setObjectName("face_frame2")
+        self.face_frame2.setScaledContents(True)
+        self.face_frame2.setFont(font4)
+        self.face_frame2.setStyleSheet("border: 1px solid white;"
+                       "font-style:bold;"
+                       )
+        self.face_frame2.setAlignment(QtCore.Qt.AlignCenter)
+        #Frame 3 
+        self.face_frame3 = QtWidgets.QLabel(self.centralwidget)
+        self.face_frame3.setGeometry(QtCore.QRect(115, 371, 85, 85 ))
+        self.face_frame3.setObjectName("face_frame3")
+        self.face_frame3.setScaledContents(True)
+        self.face_frame3.setFont(font4)
+        self.face_frame3.setStyleSheet("border: 1px solid white;"
+                       "font-style:bold;"
+                       )
+        self.face_frame3.setAlignment(QtCore.Qt.AlignCenter)
+        #Frame 4
+        self.face_frame4 = QtWidgets.QLabel(self.centralwidget)
+        self.face_frame4.setGeometry(QtCore.QRect(215, 371, 85, 85 ))
+        self.face_frame4.setObjectName("face_frame4")
+        self.face_frame4.setScaledContents(True)
+        self.face_frame4.setFont(font4)
+        self.face_frame4.setStyleSheet("border: 1px solid white;"
+                       "font-style:bold;"
+                       )
+        self.face_frame4.setAlignment(QtCore.Qt.AlignCenter)
+        #Frame 5 
+        self.face_frame5 = QtWidgets.QLabel(self.centralwidget)
+        self.face_frame5.setGeometry(QtCore.QRect(315, 371, 85, 85 ))
+        self.face_frame5.setObjectName("face_frame5")
+        self.face_frame5.setScaledContents(True)
+        self.face_frame5.setFont(font4)
+        self.face_frame5.setStyleSheet("border: 1px solid white;"
+                       "font-style:bold;"
+                       )
+        self.face_frame5.setAlignment(QtCore.Qt.AlignCenter)
 
 
         #Start Recording Button
@@ -95,14 +140,13 @@ class Ui_enrolement_addNew(object):
         self.startBTN.setIcon(QIcon("./imgs/start.ico"))
         self.startBTN.setIconSize(QtCore.QSize(20, 20))
         self.startBTN.setShortcut('Ctrl+R')
-        self.startBTN.setToolTip("Start Face Recognition")  # Tool tip
         self.startBTN.setCursor(QCursor(QtCore.Qt.PointingHandCursor))
         self.startBTN.setObjectName("startBTN")
         self.startBTN.clicked.connect(self.viewCam)
 
         #Capture Button
         self.take_pic = QtWidgets.QPushButton(self.centralwidget)
-        self.take_pic.setGeometry(QtCore.QRect(200, 45, 142, 40))
+        self.take_pic.setGeometry(QtCore.QRect(200, 45, 148, 40))
         self.take_pic.setFont(font7)
         self.take_pic.setCursor(QCursor(QtCore.Qt.PointingHandCursor))
         self.take_pic.setIcon(QIcon("./imgs/cam.png"))
@@ -116,16 +160,16 @@ class Ui_enrolement_addNew(object):
             "border: 1px solid white;"
         )
         self.take_pic.setObjectName("take_pic")
+        
+        self.take_pic.hide()
         self.take_pic.clicked.connect(self.capture_image)
 
-        #NameLabel (Save As)
-        self.nameLabel = QtWidgets.QLabel(self.centralwidget)
-        self.nameLabel.setGeometry(QtCore.QRect(45, 140, 220, 30))
-
         #NameText (Class Name Input)
-        self.nameText = QtWidgets.QLineEdit(self.centralwidget)
-        self.nameText.setGeometry(QtCore.QRect(45, 180, 200, 30))
-        self.nameText.setStyleSheet("border: 1px solid white;"
+        self.class_name_input = QtWidgets.QLineEdit(self.centralwidget)
+        self.class_name_input.setGeometry(QtCore.QRect(205, 235, 200, 30))
+        self.class_name_input.setEnabled(False)
+        self.class_name_input.setPlaceholderText('Enroll As (Last Name)')
+        self.class_name_input.setStyleSheet("border: 1px solid white;"
                       "font-style:bold;"
                       "background-color:rgb(255,255,255);"
                                     "color: rgb(0,0,0);"
@@ -133,7 +177,8 @@ class Ui_enrolement_addNew(object):
 
 
         self.enrolementBTN = QtWidgets.QPushButton(self.centralwidget)
-        self.enrolementBTN.setGeometry(QtCore.QRect(70, 225, 171, 35))
+        self.enrolementBTN.setGeometry(QtCore.QRect(220, 275, 171, 35))
+        self.enrolementBTN.setEnabled(False)
         self.enrolementBTN.setObjectName("Enrolement Boutton")
         self.enrolementBTN.setStyleSheet(
             "QPushButton::hover"
@@ -185,19 +230,8 @@ class Ui_enrolement_addNew(object):
 
     def viewCam(self):
         self.face_cascade = cv2.CascadeClassifier(FACE_DETECTION_MODELS+'haarcascade_frontalface_default.xml')
-        self.eye_cascade = cv2.CascadeClassifier(EYE_DETECTION_MODELS+'haarcascade_eye.xml')
-        frame_rate = 10
-        prev = 0
-
-
         while True:
-            stime = time.time()
-            time_elapsed = time.time() - prev
-            # Capture frame-by-frame
             ret, frame = self.capture.read()
-            if time_elapsed > 1. / frame_rate:
-                prev = time.time()
-
             gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
             image= cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
 
@@ -209,19 +243,11 @@ class Ui_enrolement_addNew(object):
 
             # Draw a rectangle around the faces
             for (x, y, w, h) in faces:
-                # comparer mon vecteur avec mon embedding
                 cv2.rectangle(image, (x, y), (x + w, y + h), (255, 0, 0), 2)
-                roi_gray = frame[y:y + h, x:x + w]
-                roi_color = image[y:y + h, x:x + w]
-                eyes = self.eye_cascade.detectMultiScale(roi_gray)#detect eyes inside face rectangle
-                for (ex, ey, ew, eh) in eyes:
-                    cv2.rectangle(roi_color, (ex, ey), (ex+ ew, ey + eh), (0,0,255), 2)
-
 
             self.frame.setPixmap(QPixmap.fromImage(qImg))
+            self.take_pic.show()
 
-
-            #self.show_fps.setText('FPS {:.1f}'.format(1 / (time.time() - stime)))
             if cv2.waitKey(0) & 0xFF == ord('z'):
                 break
 
@@ -234,9 +260,10 @@ class Ui_enrolement_addNew(object):
     def capture_image(self):
         face_cascade = cv2.CascadeClassifier(FACE_DETECTION_MODELS+'haarcascade_frontalface_default.xml')
         ret, frame = self.capture.read()
-        directory = self.nameText.text()
+        directory = self.class_name_input.text()
         path = GALLERY_IMAGES_PATH+ str(directory) + "/"
-        if os.path.isdir(path):
+        """
+                if os.path.isdir(path):
             print("Path Already Exists...")
             print("Removing " + str(directory))
             shutil.rmtree(GALLERY_IMAGES_PATH+"{}".format(str(directory)), ignore_errors=True)
@@ -245,28 +272,52 @@ class Ui_enrolement_addNew(object):
             os.mkdir(path)
         else:
             os.mkdir(path)
+        """
 
-        frame_number = 4
-        self.nameText.setEnabled(False)
-        #N = 5
-        #addon = ''.join(random.choices(string.ascii_uppercase + string.digits, k=N))
+        face_frames_labels = [self.face_frame1, self.face_frame2, self.face_frame3, self.face_frame4, self.face_frame5]
+        frame_number = 5
+        #self.class_name_input.setEnabled(False)
+        t_seconds=15
         count = 0
+
         while ret:
+            start_time = time.time()
 
             gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+            frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+            faces = face_cascade.detectMultiScale(gray, 1.3, 5)
+            print(faces)
+            print(type(faces))
+            print('===========================')
             try:
-                faces = face_cascade.detectMultiScale(gray, 1.3, 5)
-                for (x, y, w, h) in faces:
-                    roi_gray = gray[y:y + h, x:x + w]
-                    roi_color = frame[y:y + h, x:x + w]
-                    captured_img = cv2.imwrite(path + "frame-{}.jpg".format(count)  , roi_color)
-                    ret, frame = self.capture.read()
-                    count += 1
-                    if count == 25 or count == 40:
-                        self.notif.setText("Please change position")
-                        self.notif.setStyleSheet("""color : white;""")
+                if type(faces)==tuple:
+                    break
+                else: 
+                    for (x, y, w, h) in faces:
+                        
+                        roi_color = frame[y:y + h, x:x + w]
+                        if count ==0:
+                            roi_color= cv2.resize(roi_color, (170,170), interpolation=cv2.INTER_CUBIC)
+                        else :
+                            roi_color= cv2.resize(roi_color, (85,85), interpolation=cv2.INTER_CUBIC)
+                        height, width, channel = roi_color.shape
+                        print(roi_color.shape)
+                        step = channel * width
+                        qImg = QImage(roi_color.data, width, height, step, QImage.Format_RGB888)
 
-                    print("Picture " + str(count) + " Saved successfully")
+                        face_frames_labels[count].setPixmap(QPixmap.fromImage(qImg))
+                        #captured_img = cv2.imwrite(path + "frame-{}.jpg".format(count)  , roi_color)
+                        ret, frame = self.capture.read()
+                        time.sleep(2.0 - time.time() + start_time)
+                        count += 1
+                        '''
+                        if count == 25 or count == 40:
+                            self.notif.setText("Please change position")
+                            self.notif.setStyleSheet("""color : white;""")
+
+                        print("Picture " + str(count) + " Saved successfully")
+                        '''
+                    
             except:
                 pass
             if count == frame_number:
@@ -278,7 +329,7 @@ class Ui_enrolement_addNew(object):
     def feature_extraction(self):
         model_type = "vgg16"
 
-        name = self.nameText.text()
+        name = self.class_name_input.text()
         image_list = []
         feature_vectors = []
         labels = []
@@ -324,12 +375,15 @@ class Ui_enrolement_addNew(object):
     def retranslateUi(self, enrolement_addNew):
         _translate = QtCore.QCoreApplication.translate
         enrolement_addNew.setWindowTitle(_translate("enrolement_addNew", "Add New Person"))
-        self.frame.setText(_translate("enrolement_addNew", "         FRAME CAPTURE"))
-        self.face_frames.setText(_translate("MainWindow", "Captured images"))
+        self.frame.setText(_translate("enrolement_addNew", "Camera Capture Frame"))
+        self.face_frame1.setText(_translate("MainWindow", "Image \n 1"))
+        self.face_frame2.setText(_translate("MainWindow", "Image \n 2"))
+        self.face_frame3.setText(_translate("MainWindow", "Image \n 3"))
+        self.face_frame4.setText(_translate("MainWindow", "Image \n 4"))
+        self.face_frame5.setText(_translate("MainWindow", "Image \n 5"))
         self.take_pic.setText(_translate("enrolement_addNew", "Take Pictures"))
-        self.startBTN.setText(_translate("enrolement_addNew", "START CAPTURE"))
-        self.enrolementBTN.setText(_translate("enrolement_addNew", "Start Scan"))
-        self.nameLabel.setText(_translate("enrolement_addNew", "Save As (Last Name):"))
+        self.startBTN.setText(_translate("enrolement_addNew", "Open Camera"))
+        self.enrolementBTN.setText(_translate("enrolement_addNew", "Enroll"))
         self.notif.setText(_translate("enrolement_addNew", ""))
 
 

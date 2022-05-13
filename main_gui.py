@@ -332,13 +332,13 @@ class Ui_MainWindow(object):
             self.removeAccess.setChecked(False)
             self.openEnrolementAddNew()
             self.actionAjouter_personne.setChecked(False)
-            print("new clicked")
+            
 
         if self.removeAccess.isChecked():
             self.actionAjouter_personne.setChecked(False)
             self.openEnrolementChangeAccess()
             self.removeAccess.setChecked(False)
-            print("remove clicked")
+            
 
 
     def viewCam(self, test):
@@ -711,7 +711,7 @@ class Ui_MainWindow(object):
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate
         MainWindow.setWindowTitle(_translate("MainWindow", " FRekoAccess"))
-        self.recordBTN.setText(_translate("MainWindow", " Start Capture"))
+        self.recordBTN.setText(_translate("MainWindow", "Open Camera"))
         self.cam_label.setText(_translate("MainWindow", "Camera Capture Frame"))
         self.take_pic.setText(_translate("MainWindow", "Authenticate"))
         self.face_frame.setText(_translate("MainWindow", "Captured image of face"))

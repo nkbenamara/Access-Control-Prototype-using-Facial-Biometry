@@ -40,10 +40,8 @@ class Ui_enrolement_addNew(object):
         #Define Fonts
         QtGui.QFontDatabase.addApplicationFont("./fonts/Play-Regular.ttf")
 
-        #font21
-        font23 = QtGui.QFont("Play", 23)
+        #font21/7/4
         font21 = QtGui.QFont("Play", 21)
-        font11 = QtGui.QFont("Play", 11)
         font7 = QtGui.QFont("Play", 7)
         font4 = QtGui.QFont("Play", 4)
 

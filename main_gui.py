@@ -538,6 +538,7 @@ class Ui_MainWindow(object):
             np.save(HISTORY_PATH+"time_access.npy", time_access)
             
             input_img = cv2.imread(str(last_image))
+            input_img= cv2.cvtColor(input_img, cv2.COLOR_BGR2RGB)
             height, width, channel = input_img.shape
             step = channel * width
             qImg = QImage(input_img.data, width, height, step, QImage.Format_RGB888)

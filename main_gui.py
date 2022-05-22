@@ -24,6 +24,8 @@ from imutils import face_utils
 from paths import *
 from models import *
 
+from functools import partial
+
 enrol = Ui_enrolement_addNew()
 
 
@@ -78,7 +80,7 @@ class Ui_MainWindow(object):
         self.recordBTN1.setToolTip("Start Face Recognition")  # Tool tip
         self.recordBTN1.setCursor(QCursor(QtCore.Qt.PointingHandCursor))
         self.recordBTN1.setObjectName("recordBTN1")
-        self.recordBTN1.clicked.connect(self.viewCam)
+        self.recordBTN1.clicked.connect(partial(self.viewCam, cam_index=0))
         
         #Start Record Button 2
         self.recordBTN2 = QtWidgets.QPushButton(self.centralwidget)
@@ -99,7 +101,7 @@ class Ui_MainWindow(object):
         self.recordBTN2.setToolTip("Start Face Recognition")  # Tool tip
         self.recordBTN2.setCursor(QCursor(QtCore.Qt.PointingHandCursor))
         self.recordBTN2.setObjectName("recordBTN2")
-        self.recordBTN2.clicked.connect(self.viewCam)
+        self.recordBTN2.clicked.connect(partial(self.viewCam, cam_index=1))
         
         #Take Picture Button 1
         self.take_pic1 = QtWidgets.QPushButton(self.centralwidget)
@@ -120,7 +122,7 @@ class Ui_MainWindow(object):
         self.take_pic1.setCursor(QCursor(QtCore.Qt.PointingHandCursor))
         self.take_pic1.setObjectName("takePic")
         self.take_pic1.setEnabled(False)
-        self.take_pic1.clicked.connect(self.capture_image)
+        self.take_pic1.clicked.connect(partial(self.capture_image, cam_index=0))
 
         #Take Picture Button 2
         self.take_pic2 = QtWidgets.QPushButton(self.centralwidget)
@@ -141,7 +143,7 @@ class Ui_MainWindow(object):
         self.take_pic2.setCursor(QCursor(QtCore.Qt.PointingHandCursor))
         self.take_pic2.setObjectName("takePic")
         self.take_pic2.setEnabled(False)
-        self.take_pic2.clicked.connect(self.capture_image)
+        self.take_pic2.clicked.connect(partial(self.capture_image, cam_index=1))
 
         #Camera Live Recording Area 1
         self.cam_label1 = QtWidgets.QLabel(self.centralwidget)
@@ -370,8 +372,15 @@ class Ui_MainWindow(object):
 
         self.retranslateUi(MainWindow)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
+        self.capture1 = cv2.VideoCapture(1)
+        self.capture2 = cv2.VideoCapture(0)
 
-        self.capture = cv2.VideoCapture(0)
+        self.recordBTNs=[self.recordBTN1, self.recordBTN2]
+        self.takePicBTNs=[self.take_pic1, self.take_pic2]
+        self.cameras=[self.capture1, self.capture2]
+        self.camera_labels=[self.cam_label1, self.cam_label2]
+        self.face_frames=[self.face_frame1, self.face_frame2]
+
         #delete_personel("vgg16", "Djamel Hemch")
         #reinteger_all("vgg16")
 
@@ -411,12 +420,12 @@ class Ui_MainWindow(object):
             
 
 
-    def viewCam(self, test):
+    def viewCam(self, cam_index):
         _translate = QtCore.QCoreApplication.translate
         
-        self.recordBTN2.setIcon(QIcon("./imgs/stop.png"))
-        self.recordBTN2.setToolTip("Stop Face Recognition")
-        self.recordBTN2.setText(_translate("MainWindow", " Stop Capture"))
+        self.recordBTNs[cam_index].setIcon(QIcon("./imgs/stop.png"))
+        self.recordBTNs[cam_index].setToolTip("Stop Face Recognition")
+        self.recordBTNs[cam_index].setText(_translate("MainWindow", " Stop Capture"))
 
         self.EYE_AR_THRESH = 0.15
         self.COUNTER = 0
@@ -431,31 +440,41 @@ class Ui_MainWindow(object):
             stime = time.time()
             # Capture frame-by-frame
             time_elapsed = time.time() - prev
-            ret, frame = self.capture.read()
-            if time_elapsed > 1. / frame_rate:
-                prev = time.time()
+            ret1, frame1 = self.cameras[0].read()
+            ret2, frame2 = self.cameras[1].read()
+            #if time_elapsed > 1. / frame_rate:
+            #    prev = time.time()
 
-            gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
-            rects = detector(gray, 0)
+            gray1 = cv2.cvtColor(frame1, cv2.COLOR_BGR2GRAY)
+            gray2 = cv2.cvtColor(frame2, cv2.COLOR_BGR2GRAY)
+
+            rects1 = detector(gray1, 0)
+            rects2 = detector(gray2, 0)
             
-            image= cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+            image1= cv2.cvtColor(frame1, cv2.COLOR_BGR2RGB)
+            image2= cv2.cvtColor(frame2, cv2.COLOR_BGR2RGB)
 
             
-            height, width, channel = image.shape
-            step = channel * width
+            height1, width1, channel1 = image1.shape
+            height2, width2, channel2 = image2.shape
 
-            qImg = QImage(image.data, width, height, step, QImage.Format_RGB888)
+            step1 = channel1 * width1
+            step2 = channel2 * width2
 
-            # Draw a rectangle around the faces
-            for rect in rects:
-                x,y,w,h= convert_and_trim_bb(gray, rect) 
-                cv2.rectangle(image, (x, y), (x + w, y + h), (255, 0, 0), 2)
+            qImg1 = QImage(image1.data, width1, height1, step1, QImage.Format_RGB888)
+            qImg2 = QImage(image2.data, width2, height2, step2, QImage.Format_RGB888)
+            
 
-                shape = predictor(gray, rect)
-                shape = face_utils.shape_to_np(shape)
+            # Draw a rectangle around the faces (Camera 1)
+            for rect1 in rects1:
+                x1,y1,w1,h1= convert_and_trim_bb(gray1, rect1) 
+                cv2.rectangle(image1, (x1, y1), (x1 + w1, y1 + h1), (255, 0, 0), 2)
 
-                leftEye = shape[lStart:lEnd]
-                rightEye = shape[rStart:rEnd]
+                shape1 = predictor(gray1, rect1)
+                shape1 = face_utils.shape_to_np(shape1)
+
+                leftEye = shape1[lStart:lEnd]
+                rightEye = shape1[rStart:rEnd]
                 leftEAR = eye_aspect_ratio(leftEye)
                 rightEAR = eye_aspect_ratio(rightEye)
 
@@ -463,8 +482,8 @@ class Ui_MainWindow(object):
 
                 leftEyeHull = cv2.convexHull(leftEye)
                 rightEyeHull = cv2.convexHull(rightEye)
-                cv2.drawContours(image, [leftEyeHull], -1, (0, 255, 0), 1)
-                cv2.drawContours(image, [rightEyeHull], -1, (0, 255, 0), 1)
+                cv2.drawContours(image1, [leftEyeHull], -1, (0, 255, 0), 1)
+                cv2.drawContours(image1, [rightEyeHull], -1, (0, 255, 0), 1)
 
                 if ear < self.EYE_AR_THRESH:
                     self.COUNTER += 1
@@ -472,41 +491,43 @@ class Ui_MainWindow(object):
 
 
                 self.blink_count.setText("Blinks: {}".format(self.COUNTER))
-                
+            
+            # Draw a rectangle around the faces (Camera 2)
+            for rect2 in rects2:
+                x2,y2,w2,h2= convert_and_trim_bb(gray2, rect2) 
+                cv2.rectangle(image2, (x2, y2), (x2 + w2, y2 + h2), (0, 255, 0), 2)
 
             if self.anti_spoofing.isChecked():
                 if self.COUNTER >= 5:
-                    self.take_pic2.setEnabled(True)
+                    self.takePicBTNs[cam_index].setEnabled(True)
                     self.EAR_label.setText("ANTI-SPOOFING PASSED!")
                     self.EAR_label.setStyleSheet("color: green;")
                 else:
-                    self.take_pic2.setEnabled(False)
+                    self.takePicBTNs[cam_index].setEnabled(False)
                     self.EAR_label.setText("WAITING FOR ANTI-SPOOFING")
                     self.EAR_label.setStyleSheet("""color: red;""")
             else :
                 #print("anti spoofing disabled")
-                self.take_pic2.setEnabled(True)
+                self.takePicBTNs[cam_index].setEnabled(True)
                 self.EAR_label.setText("ANTI-SPOOFING DISABLED!")
                 self.EAR_label.setStyleSheet("""color: white;""")
-            self.cam_label2.setPixmap(QPixmap.fromImage(qImg))
+
+            self.camera_labels[0].setPixmap(QPixmap.fromImage(qImg1))
+            self.camera_labels[1].setPixmap(QPixmap.fromImage(qImg2))
 
 
-            self.show_fps.setText('FPS {:.1f}'.format(1 / (time.time() - stime)))
+            #self.show_fps.setText('FPS {:.1f}'.format(1 / (time.time() - stime)))
 
-            if test == 1:
-                break
-                self.capture.release()
-                self.cam_label2.clear()
-                print("Stopping capture...")
+            
 
             if cv2.waitKey(0) & 0xFF == ord('z'):
                 break
+    
 
 
-
-    def capture_image(self):
+    def capture_image(self, cam_index):
         
-        ret, frame = self.capture.read()
+        ret, frame = self.cameras[cam_index].read()
         N = 5
         addon = ''.join(random.choices(string.ascii_uppercase +  string.digits, k = N))
         image_list = []
@@ -780,7 +801,7 @@ class Ui_MainWindow(object):
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate
         MainWindow.setWindowTitle(_translate("MainWindow", " FRekoAccess"))
-        self.recordBTN1.setText(_translate("MainWindow", "Open Camera 2"))
+        self.recordBTN1.setText(_translate("MainWindow", "Open Camera 1"))
         self.recordBTN2.setText(_translate("MainWindow", "Open Camera 2"))
         self.cam_label1.setText(_translate("MainWindow", "Camera Capture Frame 1"))
         self.cam_label2.setText(_translate("MainWindow", "Camera Capture Frame 2"))

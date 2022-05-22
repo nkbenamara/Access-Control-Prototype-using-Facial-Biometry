@@ -221,7 +221,7 @@ class Ui_enrolement_addNew(object):
         self.retranslateUi(enrolement_addNew)
         QtCore.QMetaObject.connectSlotsByName(enrolement_addNew)
 
-        self.capture = cv2.VideoCapture(0)
+        self.capture = cv2.VideoCapture(1)
         
         self.enrolementBTN.clicked.connect(self.feature_extraction)
         

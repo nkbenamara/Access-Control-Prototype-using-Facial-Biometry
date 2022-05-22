@@ -43,7 +43,7 @@ class Ui_MainWindow(object):
 
         #Main Window
         MainWindow.setObjectName("MainWindow")
-        MainWindow.setFixedSize(900, 830)
+        MainWindow.setFixedSize(860, 830)
         MainWindow.setStyleSheet("background-color: #1b1553;"
         "color: #ff4b3c;"
         "font-family: Play;"
@@ -58,13 +58,13 @@ class Ui_MainWindow(object):
         #Display Live FPS
         self.show_fps = QtWidgets.QLabel(self.centralwidget)
         self.show_fps.setGeometry(QtCore.QRect(750, 550, 75, 31))
-        
-        #Start Record Button
-        self.recordBTN = QtWidgets.QPushButton(self.centralwidget)
-        self.recordBTN.setGeometry(QtCore.QRect(500, 495, 142, 40))
+
+        #Start Record Button 1
+        self.recordBTN1 = QtWidgets.QPushButton(self.centralwidget)
+        self.recordBTN1.setGeometry(QtCore.QRect(15, 450, 142, 40))
   
-        self.recordBTN.setFont(font7)
-        self.recordBTN.setStyleSheet(
+        self.recordBTN1.setFont(font7)
+        self.recordBTN1.setStyleSheet(
                                 "QPushButton::hover"
                              "{"
                              "background-color:rgb(255,255,255);"
@@ -72,19 +72,40 @@ class Ui_MainWindow(object):
                              "}"
                             "border: 1px solid white;"
                             )
-        self.recordBTN.setIcon(QIcon("./imgs/start.ico"))
-        self.recordBTN.setIconSize(QtCore.QSize(20, 20))
-        self.recordBTN.setShortcut('Ctrl+R')
-        self.recordBTN.setToolTip("Start Face Recognition")  # Tool tip
-        self.recordBTN.setCursor(QCursor(QtCore.Qt.PointingHandCursor))
-        self.recordBTN.setObjectName("recordBTN")
-        self.recordBTN.clicked.connect(self.viewCam)
+        self.recordBTN1.setIcon(QIcon("./imgs/start.ico"))
+        self.recordBTN1.setIconSize(QtCore.QSize(20, 20))
+        self.recordBTN1.setShortcut('Ctrl+R')
+        self.recordBTN1.setToolTip("Start Face Recognition")  # Tool tip
+        self.recordBTN1.setCursor(QCursor(QtCore.Qt.PointingHandCursor))
+        self.recordBTN1.setObjectName("recordBTN1")
+        self.recordBTN1.clicked.connect(self.viewCam)
         
-        #Take Picture Button
-        self.take_pic = QtWidgets.QPushButton(self.centralwidget)
-        self.take_pic.setGeometry(QtCore.QRect(650, 495, 142, 40))
-        self.take_pic.setFont(font7)
-        self.take_pic.setStyleSheet(
+        #Start Record Button 2
+        self.recordBTN2 = QtWidgets.QPushButton(self.centralwidget)
+        self.recordBTN2.setGeometry(QtCore.QRect(500, 450, 142, 40))
+  
+        self.recordBTN2.setFont(font7)
+        self.recordBTN2.setStyleSheet(
+                                "QPushButton::hover"
+                             "{"
+                             "background-color:rgb(255,255,255);"
+                            "color: black;"
+                             "}"
+                            "border: 1px solid white;"
+                            )
+        self.recordBTN2.setIcon(QIcon("./imgs/start.ico"))
+        self.recordBTN2.setIconSize(QtCore.QSize(20, 20))
+        self.recordBTN2.setShortcut('Ctrl+R')
+        self.recordBTN2.setToolTip("Start Face Recognition")  # Tool tip
+        self.recordBTN2.setCursor(QCursor(QtCore.Qt.PointingHandCursor))
+        self.recordBTN2.setObjectName("recordBTN2")
+        self.recordBTN2.clicked.connect(self.viewCam)
+        
+        #Take Picture Button 1
+        self.take_pic1 = QtWidgets.QPushButton(self.centralwidget)
+        self.take_pic1.setGeometry(QtCore.QRect(165, 450, 142, 40))
+        self.take_pic1.setFont(font7)
+        self.take_pic1.setStyleSheet(
             "QPushButton::hover"
             "{"
             "background-color:rgb(255,255,255);"
@@ -92,23 +113,53 @@ class Ui_MainWindow(object):
             "}"
             "border: 1px solid white;"
         )
-        self.take_pic.setIcon(QIcon("./imgs/cam.png"))
-        self.take_pic.setIconSize(QtCore.QSize(30, 30))
-        self.take_pic.setShortcut('Ctrl+R')
-        self.take_pic.setToolTip("Take a picture of face")  # Tool tip
-        self.take_pic.setCursor(QCursor(QtCore.Qt.PointingHandCursor))
-        self.take_pic.setObjectName("takePic")
-        self.take_pic.setEnabled(False)
-        self.take_pic.clicked.connect(self.capture_image)
+        self.take_pic1.setIcon(QIcon("./imgs/cam.png"))
+        self.take_pic1.setIconSize(QtCore.QSize(30, 30))
+        self.take_pic1.setShortcut('Ctrl+R')
+        self.take_pic1.setToolTip("Take a picture of face")  # Tool tip
+        self.take_pic1.setCursor(QCursor(QtCore.Qt.PointingHandCursor))
+        self.take_pic1.setObjectName("takePic")
+        self.take_pic1.setEnabled(False)
+        self.take_pic1.clicked.connect(self.capture_image)
 
-        #Camera Live Recording Area
-        self.cam_label = QtWidgets.QLabel(self.centralwidget)
-        self.cam_label.setGeometry(QtCore.QRect(420, 15, 451, 441))
-        self.cam_label.setObjectName("cam_label")
-        self.cam_label.setStyleSheet("border: 1px solid white;"
+        #Take Picture Button 2
+        self.take_pic2 = QtWidgets.QPushButton(self.centralwidget)
+        self.take_pic2.setGeometry(QtCore.QRect(650, 450, 142, 40))
+        self.take_pic2.setFont(font7)
+        self.take_pic2.setStyleSheet(
+            "QPushButton::hover"
+            "{"
+            "background-color:rgb(255,255,255);"
+            "color: black;"
+            "}"
+            "border: 1px solid white;"
+        )
+        self.take_pic2.setIcon(QIcon("./imgs/cam.png"))
+        self.take_pic2.setIconSize(QtCore.QSize(30, 30))
+        self.take_pic2.setShortcut('Ctrl+R')
+        self.take_pic2.setToolTip("Take a picture of face")  # Tool tip
+        self.take_pic2.setCursor(QCursor(QtCore.Qt.PointingHandCursor))
+        self.take_pic2.setObjectName("takePic")
+        self.take_pic2.setEnabled(False)
+        self.take_pic2.clicked.connect(self.capture_image)
+
+        #Camera Live Recording Area 1
+        self.cam_label1 = QtWidgets.QLabel(self.centralwidget)
+        self.cam_label1.setGeometry(QtCore.QRect(15, 15, 400, 400))
+        self.cam_label1.setObjectName("cam_label")
+        self.cam_label1.setStyleSheet("border: 1px solid white;"
                                      "font-style:bold;"
                                      )
-        self.cam_label.setAlignment(QtCore.Qt.AlignCenter)
+        self.cam_label1.setAlignment(QtCore.Qt.AlignCenter)
+
+        #Camera Live Recording Area 2
+        self.cam_label2 = QtWidgets.QLabel(self.centralwidget)
+        self.cam_label2.setGeometry(QtCore.QRect(450, 15, 400, 400))
+        self.cam_label2.setObjectName("cam_label")
+        self.cam_label2.setStyleSheet("border: 1px solid white;"
+                                     "font-style:bold;"
+                                     )
+        self.cam_label2.setAlignment(QtCore.Qt.AlignCenter)
 
         ##EAR Label Area - Camera Live Area
         self.EAR_label = QtWidgets.QLabel(self.centralwidget)
@@ -122,25 +173,45 @@ class Ui_MainWindow(object):
         self.blink_count.setObjectName("blink_count")
         self.blink_count.setFont(font15)
 
-        #Taken Picture Area
-        self.face_frame = QtWidgets.QLabel(self.centralwidget)
-        self.face_frame.setGeometry(QtCore.QRect(30, 20, 360, 400))
-        self.face_frame.setObjectName("face_frame")
-        self.face_frame.setScaledContents(True)
-        self.face_frame.setStyleSheet("border: 1px solid white;"
+        #Taken Picture Area 1
+        self.face_frame1 = QtWidgets.QLabel(self.centralwidget)
+        self.face_frame1.setGeometry(QtCore.QRect(245, 543, 85, 85))
+        self.face_frame1.setObjectName("face_frame")
+        self.face_frame1.setScaledContents(True)
+        self.face_frame1.setStyleSheet("border: 1px solid white;"
                        "font-style:bold;"
                        )
-        self.face_frame.setAlignment(QtCore.Qt.AlignCenter)
+        self.face_frame1.setAlignment(QtCore.Qt.AlignCenter)
+
+        #Taken Picture Area 2
+        self.face_frame2 = QtWidgets.QLabel(self.centralwidget)
+        self.face_frame2.setGeometry(QtCore.QRect(530, 543, 85, 85))
+        self.face_frame2.setObjectName("face_frame")
+        self.face_frame2.setScaledContents(True)
+        self.face_frame2.setStyleSheet("border: 1px solid white;"
+                       "font-style:bold;"
+                       )
+        self.face_frame2.setAlignment(QtCore.Qt.AlignCenter)
+
+        #Taken Picture Area 2
+        self.face_frame_personnel = QtWidgets.QLabel(self.centralwidget)
+        self.face_frame_personnel.setGeometry(QtCore.QRect(345, 500, 170, 170))
+        self.face_frame_personnel.setObjectName("face_frame")
+        self.face_frame_personnel.setScaledContents(True)
+        self.face_frame_personnel.setStyleSheet("border: 1px solid white;"
+                       "font-style:bold;"
+                       )
+        self.face_frame2.setAlignment(QtCore.Qt.AlignCenter)
 
         #Access Authorizations Area
-        self.history = QtWidgets.QLabel(self.centralwidget)
-        self.history.setGeometry(QtCore.QRect(30, 450, 360, 250))
-        self.history.setObjectName("authorizations")
-        self.history.setScaledContents(True)
-        self.history.setStyleSheet("border: 1px solid white;"
+        self.access_control = QtWidgets.QLabel(self.centralwidget)
+        self.access_control.setGeometry(QtCore.QRect(365, 685, 130, 85))
+        self.access_control.setObjectName("authorizations")
+        self.access_control.setScaledContents(True)
+        self.access_control.setStyleSheet("border: 1px solid white;"
                                       "font-style:bold;"
                                       )
-        self.history.setAlignment(QtCore.Qt.AlignCenter)
+        self.access_control.setAlignment(QtCore.Qt.AlignCenter)
 
         MainWindow.setCentralWidget(self.centralwidget)
         """
@@ -183,7 +254,6 @@ class Ui_MainWindow(object):
             color: #fff;
             border : 1px solid #ff4b3c;
         }
-
         """)
         #Defining Menu Bar Options
         ##Face Recognition Menu
@@ -344,9 +414,9 @@ class Ui_MainWindow(object):
     def viewCam(self, test):
         _translate = QtCore.QCoreApplication.translate
         
-        self.recordBTN.setIcon(QIcon("./imgs/stop.png"))
-        self.recordBTN.setToolTip("Stop Face Recognition")
-        self.recordBTN.setText(_translate("MainWindow", " Stop Capture"))
+        self.recordBTN2.setIcon(QIcon("./imgs/stop.png"))
+        self.recordBTN2.setToolTip("Stop Face Recognition")
+        self.recordBTN2.setText(_translate("MainWindow", " Stop Capture"))
 
         self.EYE_AR_THRESH = 0.15
         self.COUNTER = 0
@@ -406,19 +476,19 @@ class Ui_MainWindow(object):
 
             if self.anti_spoofing.isChecked():
                 if self.COUNTER >= 5:
-                    self.take_pic.setEnabled(True)
+                    self.take_pic2.setEnabled(True)
                     self.EAR_label.setText("ANTI-SPOOFING PASSED!")
                     self.EAR_label.setStyleSheet("color: green;")
                 else:
-                    self.take_pic.setEnabled(False)
+                    self.take_pic2.setEnabled(False)
                     self.EAR_label.setText("WAITING FOR ANTI-SPOOFING")
                     self.EAR_label.setStyleSheet("""color: red;""")
             else :
                 #print("anti spoofing disabled")
-                self.take_pic.setEnabled(True)
+                self.take_pic2.setEnabled(True)
                 self.EAR_label.setText("ANTI-SPOOFING DISABLED!")
                 self.EAR_label.setStyleSheet("""color: white;""")
-            self.cam_label.setPixmap(QPixmap.fromImage(qImg))
+            self.cam_label2.setPixmap(QPixmap.fromImage(qImg))
 
 
             self.show_fps.setText('FPS {:.1f}'.format(1 / (time.time() - stime)))
@@ -426,7 +496,7 @@ class Ui_MainWindow(object):
             if test == 1:
                 break
                 self.capture.release()
-                self.cam_label.clear()
+                self.cam_label2.clear()
                 print("Stopping capture...")
 
             if cv2.waitKey(0) & 0xFF == ord('z'):
@@ -498,7 +568,7 @@ class Ui_MainWindow(object):
                 class_history = np.append(class_history, face_prediction)
                 date_access = np.append(date_access, str(timing.year) + "-" + str(timing.month) + "-" + str(timing.day))
                 time_access = np.append(time_access,str(timing.hour) + ':' + str(timing.minute) + ':' + str(timing.second))
-                self.history.setText(str(face_prediction)+" personnel")
+                self.access_control.setText(str(face_prediction)+" personnel")
 
             elif face_prediction in authorized:
                 #grant
@@ -514,8 +584,8 @@ class Ui_MainWindow(object):
                 time_access = np.append(time_access, str(timing.hour) +':' + str(timing.minute) +":"+str(timing.second))
 
                 print("Authorized!")
-                self.history.setText(str(face_prediction) + ": Is Authorized")
-                self.history.setStyleSheet("color: green;""border: 1px solid white;""font-style:bold;")
+                self.access_control.setText(str(face_prediction) + ": Is Authorized")
+                self.access_control.setStyleSheet("color: green;""border: 1px solid white;""font-style:bold;")
             else:
                 #deny
                 if timing > starting_worktime and timing < ending_worktime:
@@ -527,8 +597,8 @@ class Ui_MainWindow(object):
                 class_history = np.append(class_history, face_prediction)
                 date_access = np.append(date_access, str(timing.year) + "-" + str(timing.month) + "-" + str(timing.day))
                 time_access = np.append(time_access, str(timing.hour) + ':' + str(timing.minute) + ':' + str(timing.second))
-                self.history.setText(str(face_prediction) + ": Is Unauthorized")
-                self.history.setStyleSheet("color: red;""border: 1px solid white;"
+                self.access_control.setText(str(face_prediction) + ": Is Unauthorized")
+                self.access_control.setStyleSheet("color: red;""border: 1px solid white;"
                                      "font-style:bold;")
                 
             np.save(HISTORY_PATH+"access_history.npy",access_history)
@@ -543,8 +613,8 @@ class Ui_MainWindow(object):
             step = channel * width
             qImg = QImage(input_img.data, width, height, step, QImage.Format_RGB888)
 
-            self.face_frame.setPixmap(QPixmap.fromImage(qImg))
-            self.history.setAlignment(QtCore.Qt.AlignLeft)
+            self.face_frame2.setPixmap(QPixmap.fromImage(qImg))
+            self.access_control.setAlignment(QtCore.Qt.AlignLeft)
         self.viewCam(0)
 
     def logsGenerator(self):
@@ -598,9 +668,8 @@ class Ui_MainWindow(object):
             color: #fff;
             border : 1px solid #ff4b3c;
         }
-
         """)
-            self.recordBTN.setStyleSheet(
+            self.recordBTN2.setStyleSheet(
                 "QPushButton::hover"
                 "{"
                 "background-color: #1b1553;"
@@ -608,7 +677,7 @@ class Ui_MainWindow(object):
                 "}"
                 "border: 1px solid #1b1553;"
             )
-            self.take_pic.setStyleSheet(
+            self.take_pic2.setStyleSheet(
                 "QPushButton::hover"
                 "{"
                 "background-color: #1b1553;"
@@ -616,13 +685,13 @@ class Ui_MainWindow(object):
                 "}"
                 "border: 1px solid #1b1553;"
             )
-            self.cam_label.setStyleSheet("border: 1px solid black;"
+            self.cam_label2.setStyleSheet("border: 1px solid black;"
                                          "font-style:bold;"
                                          )
-            self.history.setStyleSheet("border: 1px solid black;"
+            self.access_control.setStyleSheet("border: 1px solid black;"
                                           "font-style:bold;"
                                           )
-            self.face_frame.setStyleSheet("border: 1px solid black;"
+            self.face_frame2.setStyleSheet("border: 1px solid black;"
                                           "font-style:bold;"
                                           )
             # if it is unchecked
@@ -667,10 +736,9 @@ class Ui_MainWindow(object):
             color: #fff;
             border : 1px solid #ff4b3c;
         }
-
         """)
 
-            self.recordBTN.setStyleSheet(
+            self.recordBTN2.setStyleSheet(
                 "QPushButton::hover"
                 "{"
                 "background-color:rgb(255,255,255);"
@@ -679,7 +747,7 @@ class Ui_MainWindow(object):
                 "border: 1px solid white;"
             )
 
-            self.take_pic.setStyleSheet(
+            self.take_pic2.setStyleSheet(
                 "QPushButton::hover"
                 "{"
                 "background-color:rgb(255,255,255);"
@@ -687,13 +755,13 @@ class Ui_MainWindow(object):
                 "}"
                 "border: 1px solid white;"
             )
-            self.cam_label.setStyleSheet("border: 1px solid white;"
+            self.cam_label2.setStyleSheet("border: 1px solid white;"
                                      "font-style:bold;"
                                      )
-            self.history.setStyleSheet("border: 1px solid white;"
+            self.access_control.setStyleSheet("border: 1px solid white;"
                                        "font-style:bold;"
                                        )
-            self.face_frame.setStyleSheet("border: 1px solid white;"
+            self.face_frame2.setStyleSheet("border: 1px solid white;"
                                        "font-style:bold;"
                                        )
 
@@ -712,13 +780,17 @@ class Ui_MainWindow(object):
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate
         MainWindow.setWindowTitle(_translate("MainWindow", " FRekoAccess"))
-        self.recordBTN.setText(_translate("MainWindow", "Open Camera"))
-        self.cam_label.setText(_translate("MainWindow", "Camera Capture Frame"))
-        self.take_pic.setText(_translate("MainWindow", "Authenticate"))
-        self.face_frame.setText(_translate("MainWindow", "Captured image of face"))
+        self.recordBTN1.setText(_translate("MainWindow", "Open Camera 2"))
+        self.recordBTN2.setText(_translate("MainWindow", "Open Camera 2"))
+        self.cam_label1.setText(_translate("MainWindow", "Camera Capture Frame 1"))
+        self.cam_label2.setText(_translate("MainWindow", "Camera Capture Frame 2"))
+        self.take_pic1.setText(_translate("MainWindow", "Authenticate"))
+        self.take_pic2.setText(_translate("MainWindow", "Authenticate"))
+        self.face_frame1.setText(_translate("MainWindow", "Frame \n 1"))
+        self.face_frame2.setText(_translate("MainWindow", "Frame \n 2"))
         #self.nom.setText(_translate("MainWindow", "Nom"))
         #self.prenom.setText(_translate("MainWindow", "Prenom"))
-        self.history.setText(_translate("MainWindow", "Access Authorizations"))
+        self.access_control.setText(_translate("MainWindow", "Access Control \n Decision"))
         #self.subject_info.setText(_translate("MainWindow", " SUBJECT INFO"))
         #self.open_csv.setText(_translate("MainWindow", "Open CSV File"))
         self.menuEnrolement.setTitle(_translate("MainWindow", "Enrollment"))

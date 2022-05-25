@@ -607,7 +607,14 @@ class Ui_MainWindow(object):
             
             input_img = cv2.imread(str(last_image))
             input_img= cv2.cvtColor(input_img, cv2.COLOR_BGR2RGB)
+            print(type(input_img))
+            print(np.shape(input_img))
+            print(input_img.shape)
+            print(input_img.data)
             height, width, channel = input_img.shape
+            print(height)
+            print(width)
+            print(channel)
             step = channel * width
             qImg = QImage(input_img.data, width, height, step, QImage.Format_RGB888)
 

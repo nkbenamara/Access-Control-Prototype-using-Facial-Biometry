@@ -1,3 +1,4 @@
+from turtle import st
 from enrolement_addNew import Ui_enrolement_addNew
 from enrolement_ChangeAccess import Ui_enrolement_ChangeAccess
 from dashboard import Ui_Dashboard_Ui
@@ -504,48 +505,47 @@ class Ui_MainWindow(object):
 
     def capture_image(self, cam_index):
         
-        ret, frame = self.cameras[cam_index].read()
+        ret1, frame1 = self.cameras[0].read()
+        ret2, frame2 = self.cameras[1].read()
         N = 5
         addon = ''.join(random.choices(string.ascii_uppercase +  string.digits, k = N))
         image_list = []
         self.COUNTER = 0
-        if ret:
+        if ret1 and ret2:
 
-            gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
-
+            gray1 = cv2.cvtColor(frame1, cv2.COLOR_BGR2GRAY)
+            gray2 = cv2.cvtColor(frame2, cv2.COLOR_BGR2GRAY)
             try:
-                rects = detector(gray, 0)
-                for rect in rects:
-                    x,y,w,h= convert_and_trim_bb(gray, rect)
-                    roi_color = frame[y:y + h, x:x + w]
-                    cv2.imwrite(GALLERY_IMAGES_PATH + "frame-{}.jpg".format(addon)  , roi_color)
+                rects1 = detector(gray1, 0)
+                rects2 = detector(gray2, 0)
+                for rect1 in rects1:
+                    x1,y1,w1,h1= convert_and_trim_bb(gray1, rect1)
+                    roi_color1 = frame1[y1:y1 + h1, x1:x1 + w1]
+                    
+                img1=cv2.cvtColor(roi_color1, cv2.COLOR_BGR2RGB)
+                qImg1 = QImage(img1, w1, h1, 3*w1, QImage.Format_RGB888)
+                self.face_frame1.setPixmap(QPixmap.fromImage(qImg1))
+
+                for rect2 in rects2:
+                    x2,y2,w2,h2= convert_and_trim_bb(gray2, rect2)
+                    roi_color2 = frame2[y2:y2 + h2, x2:x2 + w2]
+                    
+                img2=cv2.cvtColor(roi_color2, cv2.COLOR_BGR2RGB)
+                qImg2 = QImage(img2, w2, h2, 3*w2, QImage.Format_RGB888)
+                self.face_frame2.setPixmap(QPixmap.fromImage(qImg2))
 
             except:
                 pass
-            ts = 0
-            found = None
-
-            os.getcwd()
-            #Fething the face images captured
-            for file_name in glob(GALLERY_IMAGES_PATH+"*.jpg"):
-                fts = os.path.getmtime(file_name)
-                print(fts)
-
-                if fts > ts:
-                    ts = fts
-                    found = file_name
-                    #Getting the latest captured face image and prints it
-
+            
             x_train = np.load(GALLERY_PATH+"vgg16_x_train.npy")
             y_train = np.load(GALLERY_PATH+"vgg16_y_train.npy")
-            last_image = found
 
-            roi_color = cv2.resize(roi_color, (224, 224),interpolation= cv2.INTER_AREA)  # load an image and resize it to 224,224 like vgg face input size
-            roi_color = img_to_array(roi_color)  # convert the image to an array
-            roi_color = np.expand_dims(roi_color,axis=0)  # add the 4th dimension as a tensor to inject through the vgg face network
-            roi_color = utils.preprocess_input(roi_color, version= 1)  # preprocess the image 1 = vggface resnet = 2)
-            feature_vector = vgg_face_model.predict(roi_color)  # extract the features
-            face_prediction = prediction_cosine_similarity2(x_train, y_train, feature_vector, 5)[0]
+            roi_color1 = cv2.resize(roi_color1, (224, 224),interpolation= cv2.INTER_AREA)  # load an image and resize it to 224,224 like vgg face input size
+            roi_color1 = img_to_array(roi_color1)  # convert the image to an array
+            roi_color1 = np.expand_dims(roi_color1,axis=0)  # add the 4th dimension as a tensor to inject through the vgg face network
+            roi_color1 = utils.preprocess_input(roi_color1, version= 1)  # preprocess the image 1 = vggface resnet = 2)
+            feature_vector1 = vgg_face_model.predict(roi_color1)  # extract the features
+            face_prediction1 = prediction_cosine_similarity2(x_train, y_train, feature_vector1, 5)[0]
 
             authorized = np.load(HISTORY_PATH+"authorized.npy")
             access_history = np.load(HISTORY_PATH+"access_history.npy")
@@ -558,32 +558,43 @@ class Ui_MainWindow(object):
             starting_worktime= datetime(timing.year, timing.month, timing.day, 8, 0, 0)
             ending_worktime = datetime(timing.year, timing.month, timing.day, 18, 0, 0)
             
-
-
-            if face_prediction == 'Not Recognized':
+            if face_prediction1 == 'Not Recognized':
 
                 access_history = np.append(access_history, "Rejected" + '\n'+ "(Unrecognized)")
-                class_history = np.append(class_history, face_prediction)
+                class_history = np.append(class_history, face_prediction1)
                 date_access = np.append(date_access, str(timing.year) + "-" + str(timing.month) + "-" + str(timing.day))
                 time_access = np.append(time_access,str(timing.hour) + ':' + str(timing.minute) + ':' + str(timing.second))
                 self.access_control.setText("Unrecognized \n personnel")
 
-            elif face_prediction in authorized:
+                unkown_image = cv2.imread(MAIN_PATH+'/imgs/unknown.jpg')
+                height, width, channel = unkown_image.shape
+                step = channel * width
+                qImg_unkown = QImage(unkown_image.data, width, height, step, QImage.Format_RGB888)
+                self.face_frame_personnel.setPixmap(QPixmap.fromImage(qImg_unkown))               
+
+            elif face_prediction1 in authorized:
                 #grant
                 if timing > starting_worktime and timing < ending_worktime:
                     accesstime_history = np.append(accesstime_history,"Authorized at"+'\n'+"working hours")
                 else:
                     accesstime_history = np.append(accesstime_history,"Authorized after"+'\n' +"working hours")
 
-
                 access_history = np.append(access_history, "Authorized")
-                class_history = np.append(class_history, face_prediction)
+                class_history = np.append(class_history, face_prediction1)
                 date_access = np.append(date_access, str(timing.year) +"-" + str(timing.month) +"-"+str(timing.day))
                 time_access = np.append(time_access, str(timing.hour) +':' + str(timing.minute) +":"+str(timing.second))
 
-                print("Authorized!")
-                self.access_control.setText(str(face_prediction) + "\n Authorized")
+
+                self.access_control.setText(str(face_prediction1) + "\n Authorized")
                 self.access_control.setStyleSheet("color: green;""border: 1px solid white;""font-style:bold;")
+                
+                prediction_image= cv2.imread(glob(GALLERY_IMAGES_PATH+face_prediction1+'/*')[0])
+                prediction_image= cv2.cvtColor(prediction_image, cv2.COLOR_BGR2RGB)
+                height, width, channel = prediction_image.shape
+                step = channel * width
+                qImg_prediction = QImage(prediction_image.data, width, height, step, QImage.Format_RGB888)
+                self.face_frame_personnel.setPixmap(QPixmap.fromImage(qImg_prediction))    
+                self.face_frame_personnel.setStyleSheet("border: 4px solid green;")
             else:
                 #deny
                 if timing > starting_worktime and timing < ending_worktime:
@@ -592,12 +603,21 @@ class Ui_MainWindow(object):
                     accesstime_history = np.append(accesstime_history, "Rejected after" + '\n' + "working hours")
                 
                 access_history=np.append(access_history, "Rejected" + '\n'+ "(Recognized)")
-                class_history = np.append(class_history, face_prediction)
+                class_history = np.append(class_history, face_prediction1)
                 date_access = np.append(date_access, str(timing.year) + "-" + str(timing.month) + "-" + str(timing.day))
                 time_access = np.append(time_access, str(timing.hour) + ':' + str(timing.minute) + ':' + str(timing.second))
-                self.access_control.setText(str(face_prediction) + "\n Unauthorized")
+
+                self.access_control.setText(str(face_prediction1) + "\n Unauthorized")
                 self.access_control.setStyleSheet("color: red;""border: 1px solid white;"
                                      "font-style:bold;")
+
+                prediction_image= cv2.imread(glob(GALLERY_IMAGES_PATH+face_prediction1+'/*')[0])
+                prediction_image= cv2.cvtColor(prediction_image, cv2.COLOR_BGR2RGB)
+                height, width, channel = prediction_image.shape
+                step = channel * width
+                qImg_prediction = QImage(prediction_image.data, width, height, step, QImage.Format_RGB888)
+                self.face_frame_personnel.setPixmap(QPixmap.fromImage(qImg_prediction))  
+                self.face_frame_personnel.setStyleSheet("border: 4px solid red;")
                 
             np.save(HISTORY_PATH+"access_history.npy",access_history)
             np.save(HISTORY_PATH+"accessTime_history.npy",accesstime_history)
@@ -605,22 +625,6 @@ class Ui_MainWindow(object):
             np.save(HISTORY_PATH+"date_access.npy", date_access)
             np.save(HISTORY_PATH+"time_access.npy", time_access)
             
-            input_img = cv2.imread(str(last_image))
-            input_img= cv2.cvtColor(input_img, cv2.COLOR_BGR2RGB)
-            print(type(input_img))
-            print(np.shape(input_img))
-            print(input_img.shape)
-            print(input_img.data)
-            height, width, channel = input_img.shape
-            print(height)
-            print(width)
-            print(channel)
-            step = channel * width
-            qImg = QImage(input_img.data, width, height, step, QImage.Format_RGB888)
-
-            self.face_frame1.setPixmap(QPixmap.fromImage(qImg))
-            self.access_control.setAlignment(QtCore.Qt.AlignLeft)
-        self.viewCam(0)
 
     def logsGenerator(self):
 

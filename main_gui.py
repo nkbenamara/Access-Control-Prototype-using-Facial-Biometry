@@ -41,6 +41,7 @@ class Ui_MainWindow(object):
         QtGui.QFontDatabase.addApplicationFont("./fonts/Play-Regular.ttf")
         
         ##Font7 & Font15
+        font3= QtGui.QFont("Play", 3)
         font7 = QtGui.QFont("Play", 7)
         font15 = QtGui.QFont("Play",15)
 
@@ -136,7 +137,7 @@ class Ui_MainWindow(object):
 
         ##Blink Count Area - Camera Live Area
         self.blink_count = QtWidgets.QLabel(self.centralwidget)
-        self.blink_count.setGeometry(QtCore.QRect(660, 600, 150, 60))
+        self.blink_count.setGeometry(QtCore.QRect(650, 600, 150, 60))
         self.blink_count.setObjectName("blink_count")
         self.blink_count.setFont(font15)
         self.blink_count.setAlignment(QtCore.Qt.AlignCenter)
@@ -174,7 +175,26 @@ class Ui_MainWindow(object):
                        "font-style:bold;"
                        )
         self.face_frame2.setAlignment(QtCore.Qt.AlignCenter)
+        
+        ##Prediction class 1
+        self.pred_class1 = QtWidgets.QLabel(self.centralwidget)
+        self.pred_class1.setGeometry(QtCore.QRect(225, 643, 105, 40))
+        self.pred_class1.setObjectName("pred_class1")
+        self.pred_class1.setAlignment(QtCore.Qt.AlignCenter)
+        self.pred_class1.setStyleSheet("border: 1px solid white;"
+                                     "font-style:bold;"
+                                     "font-size: 13px"
+                                     )
 
+        ##Prediction class 2
+        self.pred_class2 = QtWidgets.QLabel(self.centralwidget)
+        self.pred_class2.setGeometry(QtCore.QRect(530, 643, 105, 40))
+        self.pred_class2.setObjectName("pred_class2")
+        self.pred_class2.setAlignment(QtCore.Qt.AlignCenter)
+        self.pred_class2.setStyleSheet("border: 1px solid white;"
+                                     "font-style:bold;"
+                                     "font-size: 13px"
+                                     )                             
         #Access Authorizations Area
         self.access_control = QtWidgets.QLabel(self.centralwidget)
         self.access_control.setGeometry(QtCore.QRect(365, 685, 130, 85))
@@ -547,6 +567,17 @@ class Ui_MainWindow(object):
             feature_vector1 = vgg_face_model.predict(roi_color1)  # extract the features
             face_prediction1 = prediction_cosine_similarity2(x_train, y_train, feature_vector1, 5)[0]
 
+            self.pred_class1.setText(str(face_prediction1))
+
+            roi_color2 = cv2.resize(roi_color2, (224, 224),interpolation= cv2.INTER_AREA)  # load an image and resize it to 224,224 like vgg face input size
+            roi_color2 = img_to_array(roi_color2)  # convert the image to an array
+            roi_color2 = np.expand_dims(roi_color2,axis=0)  # add the 4th dimension as a tensor to inject through the vgg face network
+            roi_color2 = utils.preprocess_input(roi_color2, version= 1)  # preprocess the image 1 = vggface resnet = 2)
+            feature_vector2 = vgg_face_model.predict(roi_color2)  # extract the features
+            face_prediction2 = prediction_cosine_similarity2(x_train, y_train, feature_vector2, 5)[0]
+
+            self.pred_class2.setText(str(face_prediction2))
+
             authorized = np.load(HISTORY_PATH+"authorized.npy")
             access_history = np.load(HISTORY_PATH+"access_history.npy")
             accesstime_history= np.load(HISTORY_PATH+"accesstime_history.npy")
@@ -558,7 +589,7 @@ class Ui_MainWindow(object):
             starting_worktime= datetime(timing.year, timing.month, timing.day, 8, 0, 0)
             ending_worktime = datetime(timing.year, timing.month, timing.day, 18, 0, 0)
             
-            if face_prediction1 == 'Not Recognized':
+            if (face_prediction1 == 'Not Recognized' and face_prediction2 == 'Not Recognized') :
 
                 access_history = np.append(access_history, "Rejected" + '\n'+ "(Unrecognized)")
                 class_history = np.append(class_history, face_prediction1)
@@ -572,7 +603,7 @@ class Ui_MainWindow(object):
                 qImg_unkown = QImage(unkown_image.data, width, height, step, QImage.Format_RGB888)
                 self.face_frame_personnel.setPixmap(QPixmap.fromImage(qImg_unkown))               
 
-            elif face_prediction1 in authorized:
+            elif (face_prediction1==face_prediction2) and (face_prediction1 in authorized):
                 #grant
                 if timing > starting_worktime and timing < ending_worktime:
                     accesstime_history = np.append(accesstime_history,"Authorized at"+'\n'+"working hours")
@@ -595,7 +626,7 @@ class Ui_MainWindow(object):
                 qImg_prediction = QImage(prediction_image.data, width, height, step, QImage.Format_RGB888)
                 self.face_frame_personnel.setPixmap(QPixmap.fromImage(qImg_prediction))    
                 self.face_frame_personnel.setStyleSheet("border: 4px solid green;")
-            else:
+            elif (face_prediction1==face_prediction2) and (face_prediction1 not in authorized):
                 #deny
                 if timing > starting_worktime and timing < ending_worktime:
                     accesstime_history = np.append(accesstime_history, "Rejected at" + '\n' + "working hours")
@@ -618,7 +649,31 @@ class Ui_MainWindow(object):
                 qImg_prediction = QImage(prediction_image.data, width, height, step, QImage.Format_RGB888)
                 self.face_frame_personnel.setPixmap(QPixmap.fromImage(qImg_prediction))  
                 self.face_frame_personnel.setStyleSheet("border: 4px solid red;")
-                
+            elif (face_prediction1!=face_prediction2) and (face_prediction1 == 'Not Recognized' or face_prediction2 == 'Not Recognized'):
+
+                self.access_control.setText("Double \n Identification \n Failed")
+                self.access_control.setStyleSheet("color: red;""border: 1px solid white;"
+                                     "font-style:bold;")
+
+                unkown_image = cv2.imread(MAIN_PATH+'/imgs/unknown.jpg')
+                unkown_image= cv2.cvtColor(unkown_image, cv2.COLOR_BGR2RGB)
+                height, width, channel = unkown_image.shape
+                step = channel * width
+                qImg_unkown = QImage(unkown_image.data, width, height, step, QImage.Format_RGB888)
+                self.face_frame_personnel.setPixmap(QPixmap.fromImage(qImg_unkown))  
+                self.face_frame_personnel.setStyleSheet("border: 4px solid red;")
+            else : 
+                self.access_control.setText("Double \n Identification \n Failed")
+                self.access_control.setStyleSheet("color: red;""border: 1px solid white;"
+                                     "font-style:bold;")
+
+                unkown_image = cv2.imread(MAIN_PATH+'/imgs/unknown.jpg')
+                unkown_image= cv2.cvtColor(unkown_image, cv2.COLOR_BGR2RGB)
+                height, width, channel = unkown_image.shape
+                step = channel * width
+                qImg_unkown = QImage(unkown_image.data, width, height, step, QImage.Format_RGB888)
+                self.face_frame_personnel.setPixmap(QPixmap.fromImage(qImg_unkown))  
+                self.face_frame_personnel.setStyleSheet("border: 4px solid red;")
             np.save(HISTORY_PATH+"access_history.npy",access_history)
             np.save(HISTORY_PATH+"accessTime_history.npy",accesstime_history)
             np.save(HISTORY_PATH+"class_access_history.npy", class_history)
@@ -797,6 +852,8 @@ class Ui_MainWindow(object):
         self.face_frame2.setText(_translate("MainWindow", "Frame \n 2"))
         self.EAR_label.setText(_translate("MainWindow", "Anti-spoofing \n Mode"))
         self.blink_count.setText(_translate("MainWindow", "Blink \n Counter"))
+        self.pred_class1.setText(_translate("MainWindow", "ID 1"))
+        self.pred_class2.setText(_translate("MainWindow", "ID 2"))
         #self.nom.setText(_translate("MainWindow", "Nom"))
         #self.prenom.setText(_translate("MainWindow", "Prenom"))
         self.access_control.setText(_translate("MainWindow", "Access Control \n Decision"))

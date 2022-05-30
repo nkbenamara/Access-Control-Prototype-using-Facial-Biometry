@@ -125,6 +125,26 @@ class Ui_MainWindow(object):
                                      )
         self.cam_label2.setAlignment(QtCore.Qt.AlignCenter)
 
+        #NoFace Detected Area 1 
+        self.No_Face_1 = QtWidgets.QLabel(self.centralwidget)
+        self.No_Face_1.setGeometry(QtCore.QRect(165, 350, 150, 30))
+        self.No_Face_1.setObjectName("No_Face_1")
+        self.No_Face_1.setFont(font15)
+        self.No_Face_1.setStyleSheet("background-color:rgba(255,75,60,200);"
+                                    "color: white;"
+                                     "font-style:bold;"
+                                     )
+        self.No_Face_1.setAlignment(QtCore.Qt.AlignCenter)
+        self.No_Face_1.setVisible(False)
+        
+        #NoFace Detected Area 2
+        self.No_Face_2 = QtWidgets.QLabel(self.centralwidget)
+        self.No_Face_2.setGeometry(QtCore.QRect(600, 350, 150, 30))
+        self.No_Face_2.setObjectName("No_Face_2")
+        self.No_Face_2.setFont(font15)
+        self.No_Face_2.setAlignment(QtCore.Qt.AlignCenter)
+        self.No_Face_2.setVisible(False)
+        
         ##EAR Label Area - Camera Live Area
         self.EAR_label = QtWidgets.QLabel(self.centralwidget)
         self.EAR_label.setGeometry(QtCore.QRect(60, 600, 150, 60))
@@ -145,7 +165,6 @@ class Ui_MainWindow(object):
                                      "font-style:bold;"
                                      )
         
-
         #Taken Picture Area 1
         self.face_frame1 = QtWidgets.QLabel(self.centralwidget)
         self.face_frame1.setGeometry(QtCore.QRect(245, 543, 85, 85))
@@ -455,39 +474,70 @@ class Ui_MainWindow(object):
             
 
             # Draw a rectangle around the faces (Camera 1)
-            for rect1 in rects1:
-                x1,y1,w1,h1= convert_and_trim_bb(gray1, rect1) 
-                cv2.rectangle(image1, (x1, y1), (x1 + w1, y1 + h1), (255, 0, 0), 2)
-
-
+            if len(rects1)!=0:
+                self.No_Face_1.setVisible(True)
+                self.No_Face_1.setStyleSheet(
+                                    "background-color:rgba(3,174,80,200);"
+                                     "font-style:bold;"
+                                     "color: white;"
+                                     )
+                self.No_Face_1.setText("Face Detected")
+                for rect1 in rects1: 
+                    x1,y1,w1,h1= convert_and_trim_bb(gray1, rect1) 
+                    cv2.rectangle(image1, (x1, y1), (x1 + w1, y1 + h1), (255, 0, 0), 2)
+            else:
+                self.No_Face_1.setStyleSheet(
+                                    "background-color:rgba(255,75,60,200);"
+                                     "font-style:bold;"
+                                     "color: white;"
+                                     )
+                self.No_Face_1.setText("No Face Detected")
+                self.No_Face_1.setVisible(True)
+                
 
             
             # Draw a rectangle around the faces (Camera 2)
-            for rect2 in rects2:
-                x2,y2,w2,h2= convert_and_trim_bb(gray2, rect2) 
-                cv2.rectangle(image2, (x2, y2), (x2 + w2, y2 + h2), (0, 255, 0), 2)
+            if len(rects2)!=0:
+                self.No_Face_2.setVisible(True)
+                self.No_Face_2.setStyleSheet(
+                                    "background-color:rgba(3,174,80,200);"
+                                     "font-style:bold;"
+                                     "color: white;"
+                                     )
+                self.No_Face_2.setText("Face Detected")
+                for rect2 in rects2:
+                    x2,y2,w2,h2= convert_and_trim_bb(gray2, rect2) 
+                    cv2.rectangle(image2, (x2, y2), (x2 + w2, y2 + h2), (0, 255, 0), 2)
 
-                shape2 = predictor(gray2, rect2)
-                shape2 = face_utils.shape_to_np(shape2)
+                    shape2 = predictor(gray2, rect2)
+                    shape2 = face_utils.shape_to_np(shape2)
 
-                leftEye = shape2[lStart:lEnd]
-                rightEye = shape2[rStart:rEnd]
-                leftEAR = eye_aspect_ratio(leftEye)
-                rightEAR = eye_aspect_ratio(rightEye)
+                    leftEye = shape2[lStart:lEnd]
+                    rightEye = shape2[rStart:rEnd]
+                    leftEAR = eye_aspect_ratio(leftEye)
+                    rightEAR = eye_aspect_ratio(rightEye)
 
-                ear = (leftEAR + rightEAR) / 2.0
+                    ear = (leftEAR + rightEAR) / 2.0
 
-                leftEyeHull = cv2.convexHull(leftEye)
-                rightEyeHull = cv2.convexHull(rightEye)
-                cv2.drawContours(image2, [leftEyeHull], -1, (0, 255, 0), 1)
-                cv2.drawContours(image2, [rightEyeHull], -1, (0, 255, 0), 1)
+                    leftEyeHull = cv2.convexHull(leftEye)
+                    rightEyeHull = cv2.convexHull(rightEye)
+                    cv2.drawContours(image2, [leftEyeHull], -1, (0, 255, 0), 1)
+                    cv2.drawContours(image2, [rightEyeHull], -1, (0, 255, 0), 1)
 
-                if ear < self.EYE_AR_THRESH:
-                    self.COUNTER += 1
-                    time.sleep(0.099)
+                    if ear < self.EYE_AR_THRESH:
+                        self.COUNTER += 1
+                        time.sleep(0.099)
 
 
-                self.blink_count.setText("Blinks \n {}".format(self.COUNTER))
+                    self.blink_count.setText("Blinks \n {}".format(self.COUNTER))
+            else:
+                self.No_Face_2.setStyleSheet(
+                                    "background-color:rgba(255,75,60,200);"
+                                     "font-style:bold;"
+                                     "color: white;"
+                                     )
+                self.No_Face_2.setText("No Face Detected")
+                self.No_Face_2.setVisible(True)
 
             if self.anti_spoofing.isChecked():
                 if self.COUNTER >= 5:
@@ -854,7 +904,6 @@ class Ui_MainWindow(object):
         self.blink_count.setText(_translate("MainWindow", "Blink \n Counter"))
         self.pred_class1.setText(_translate("MainWindow", "ID 1"))
         self.pred_class2.setText(_translate("MainWindow", "ID 2"))
-        #self.nom.setText(_translate("MainWindow", "Nom"))
         #self.prenom.setText(_translate("MainWindow", "Prenom"))
         self.access_control.setText(_translate("MainWindow", "Access Control \n Decision"))
         #self.subject_info.setText(_translate("MainWindow", " SUBJECT INFO"))

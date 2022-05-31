@@ -144,6 +144,19 @@ class Ui_MainWindow(object):
         self.No_Face_2.setFont(font15)
         self.No_Face_2.setAlignment(QtCore.Qt.AlignCenter)
         self.No_Face_2.setVisible(False)
+
+        #Blink Counter Area 2
+        self.Blink_Face_2 = QtWidgets.QLabel(self.centralwidget)
+        self.Blink_Face_2.setGeometry(QtCore.QRect(600, 380, 150, 30))
+        self.Blink_Face_2.setObjectName("Blink_Face_2")
+        self.Blink_Face_2.setFont(font15)
+        self.Blink_Face_2.setAlignment(QtCore.Qt.AlignCenter)
+        self.Blink_Face_2.setVisible(False)
+        self.Blink_Face_2.setStyleSheet(
+                                    "background-color:rgba(3,174,80,200);"
+                                     "font-style:bold;"
+                                     "color: white;"
+                                     )
         
         ##EAR Label Area - Camera Live Area
         self.EAR_label = QtWidgets.QLabel(self.centralwidget)
@@ -524,12 +537,56 @@ class Ui_MainWindow(object):
                     cv2.drawContours(image2, [leftEyeHull], -1, (0, 255, 0), 1)
                     cv2.drawContours(image2, [rightEyeHull], -1, (0, 255, 0), 1)
 
-                    if ear < self.EYE_AR_THRESH:
-                        self.COUNTER += 1
-                        time.sleep(0.099)
+                    
 
+                    if self.anti_spoofing.isChecked():
+                        self.Blink_Face_2.setVisible(True)
+                        self.Blink_Face_2.setText("Blink {} times".format(3))
+                        if ear < self.EYE_AR_THRESH:
+                            self.COUNTER += 1
+                            self.Blink_Face_2.setText("Blink {} times".format(3-self.COUNTER))
+                            time.sleep(0.099)
 
-                    self.blink_count.setText("Blinks \n {}".format(self.COUNTER))
+                        if self.COUNTER >= 3:
+                            self.Blink_Face_2.setVisible(False)
+                            self.take_pic.setEnabled(False)
+                            self.EAR_label.setText("Anti-spoofing \n Passed")
+                            self.EAR_label.setStyleSheet("color: green;"
+                            "border: 1px solid white;"
+                            "font-style:bold;")
+                            self.blink_count.setText("Blinks \n Passed")
+                            self.blink_count.setStyleSheet("color: green;"
+                            "border: 1px solid white;"
+                            "font-style:bold;") 
+                            if len(rects1)!=0 and len(rects2)!=0:
+                                self.take_pic.setEnabled(True)
+                            else:
+                                self.take_pic.setEnabled(False) 
+                            
+                        else:
+                            self.take_pic.setEnabled(False)
+                            self.EAR_label.setText("Anti-spoofing \n Enabled")
+                            self.EAR_label.setStyleSheet("color: red;"
+                            "border: 1px solid white;"
+                            "font-style:bold;")
+                            self.blink_count.setText("Blinks \n {}".format(self.COUNTER))
+                               
+                    else :
+                        self.Blink_Face_2.setVisible(False)
+                        self.EAR_label.setText("Anti-spoofing \n Disabled")
+                        self.EAR_label.setStyleSheet("color: white;"
+                        "border: 1px solid white;"
+                        "font-style:bold;")
+                        self.blink_count.setText("Anti-spoofing \n Disabled")
+                        self.blink_count.setStyleSheet("color: white;"
+                        "border: 1px solid white;"
+                        "font-style:bold;")
+                        if len(rects1)!=0 and len(rects2)!=0:
+                                self.take_pic.setEnabled(True)
+                        else:
+                                self.take_pic.setEnabled(False) 
+
+                    
             else:
                 self.No_Face_2.setStyleSheet(
                                     "background-color:rgba(255,75,60,200);"
@@ -539,34 +596,11 @@ class Ui_MainWindow(object):
                 self.No_Face_2.setText("No Face Detected")
                 self.No_Face_2.setVisible(True)
 
-            if self.anti_spoofing.isChecked():
-                if self.COUNTER >= 5:
-                    self.take_pic.setEnabled(True)
-                    self.EAR_label.setText("Anti-spoofing \n Passed")
-                    self.EAR_label.setStyleSheet("color: green;"
-                    "border: 1px solid white;"
-                    "font-style:bold;")
-                else:
-                    self.take_pic.setEnabled(False)
-                    self.EAR_label.setText("Anti-spoofing \n Enabled")
-                    self.EAR_label.setStyleSheet("color: red;"
-                    "border: 1px solid white;"
-                    "font-style:bold;")
-            else :
-                #print("anti spoofing disabled")
-                self.take_pic.setEnabled(True)
-                self.EAR_label.setText("Anti-spoofing \n Disabled")
-                self.EAR_label.setStyleSheet("color: white;"
-                "border: 1px solid white;"
-                "font-style:bold;")
+            
 
             self.camera_labels[0].setPixmap(QPixmap.fromImage(qImg1))
             self.camera_labels[1].setPixmap(QPixmap.fromImage(qImg2))
 
-
-            #self.show_fps.setText('FPS {:.1f}'.format(1 / (time.time() - stime)))
-
-            
 
             if cv2.waitKey(0) & 0xFF == ord('z'):
                 break

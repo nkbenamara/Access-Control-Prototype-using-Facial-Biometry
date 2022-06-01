@@ -511,13 +511,6 @@ class Ui_MainWindow(object):
             ret1, frame1 = self.cameras[0].read()
             ret2, frame2 = self.cameras[1].read()
             
-            print('=================================')
-            print(type(frame1))
-            print(np.shape(frame1))
-            
-            print('=================================')
-            print(type(frame2))
-            print(np.shape(frame2))
             if frame1 is None:
                 self.camera_labels[0].setPixmap(QPixmap.fromImage(qImg1))
                 self.camera_labels[1].setPixmap(QPixmap.fromImage(qImg2))
@@ -666,6 +659,7 @@ class Ui_MainWindow(object):
     def stopVideo(self):
         self.capture1.release()
         self.capture2.release()
+        self.take_pic.setEnabled(False)
         self.Camera_Stopped_1.setVisible(True)
         self.Camera_Stopped_2.setVisible(True)
         self.No_Face_1.setVisible(False)

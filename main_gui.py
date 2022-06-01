@@ -79,10 +79,33 @@ class Ui_MainWindow(object):
         self.recordBTN.setIcon(QIcon("./imgs/start.ico"))
         self.recordBTN.setIconSize(QtCore.QSize(20, 20))
         self.recordBTN.setShortcut('Ctrl+R')
-        self.recordBTN.setToolTip("Start Face Recognition")  # Tool tip
+        self.recordBTN.setToolTip("Start Recording")  # Tool tip
         self.recordBTN.setCursor(QCursor(QtCore.Qt.PointingHandCursor))
-        self.recordBTN.setObjectName("recordBTN1")
-        self.recordBTN.clicked.connect(partial(self.viewCam, cam_index=0))
+        self.recordBTN.setObjectName("recordBTN")
+        self.recordBTN.setVisible(True)
+        self.recordBTN.clicked.connect(self.viewCam)
+
+        #Stop Record Button 1
+        self.stopBTN = QtWidgets.QPushButton(self.centralwidget)
+        self.stopBTN.setGeometry(QtCore.QRect(285, 450, 142, 40))
+  
+        self.stopBTN.setFont(font7)
+        self.stopBTN.setStyleSheet(
+                                "QPushButton::hover"
+                             "{"
+                             "background-color:rgb(255,255,255);"
+                            "color: black;"
+                             "}"
+                            "border: 1px solid white;"
+                            )
+        self.stopBTN.setIcon(QIcon("./imgs/stop.png"))
+        self.stopBTN.setIconSize(QtCore.QSize(20, 20))
+        self.stopBTN.setShortcut('Ctrl+S')
+        self.stopBTN.setToolTip("Stop Recording")  # Tool tip
+        self.stopBTN.setCursor(QCursor(QtCore.Qt.PointingHandCursor))
+        self.stopBTN.setObjectName("stopBTN")
+        self.stopBTN.setVisible(False)
+        self.stopBTN.clicked.connect(self.stopVideo)
         
         
         #Take Picture Button 1
@@ -104,7 +127,7 @@ class Ui_MainWindow(object):
         self.take_pic.setCursor(QCursor(QtCore.Qt.PointingHandCursor))
         self.take_pic.setObjectName("takePic")
         self.take_pic.setEnabled(False)
-        self.take_pic.clicked.connect(partial(self.capture_image, cam_index=0))
+        self.take_pic.clicked.connect(partial(self.capture_image, cam_index=1))
 
 
         #Camera Live Recording Area 1
@@ -127,7 +150,7 @@ class Ui_MainWindow(object):
 
         #NoFace Detected Area 1 
         self.No_Face_1 = QtWidgets.QLabel(self.centralwidget)
-        self.No_Face_1.setGeometry(QtCore.QRect(165, 350, 150, 30))
+        self.No_Face_1.setGeometry(QtCore.QRect(140, 350, 150, 30))
         self.No_Face_1.setObjectName("No_Face_1")
         self.No_Face_1.setFont(font15)
         self.No_Face_1.setStyleSheet("background-color:rgba(255,75,60,200);"
@@ -139,11 +162,35 @@ class Ui_MainWindow(object):
         
         #NoFace Detected Area 2
         self.No_Face_2 = QtWidgets.QLabel(self.centralwidget)
-        self.No_Face_2.setGeometry(QtCore.QRect(600, 350, 150, 30))
+        self.No_Face_2.setGeometry(QtCore.QRect(575, 350, 150, 30))
         self.No_Face_2.setObjectName("No_Face_2")
         self.No_Face_2.setFont(font15)
         self.No_Face_2.setAlignment(QtCore.Qt.AlignCenter)
         self.No_Face_2.setVisible(False)
+
+        #Stopped Camera Area 1 
+        self.Camera_Stopped_1 = QtWidgets.QLabel(self.centralwidget)
+        self.Camera_Stopped_1.setGeometry(QtCore.QRect(140, 175, 150, 50))
+        self.Camera_Stopped_1.setObjectName("Camera_Stopped_1")
+        self.Camera_Stopped_1.setFont(font15)
+        self.Camera_Stopped_1.setStyleSheet("background-color:rgba(255,75,60,200);"
+                                    "color: white;"
+                                     "font-style:bold;"
+                                     )
+        self.Camera_Stopped_1.setAlignment(QtCore.Qt.AlignCenter)
+        self.Camera_Stopped_1.setVisible(False)
+        
+        #Stopped Camera Area 2
+        self.Camera_Stopped_2 = QtWidgets.QLabel(self.centralwidget)
+        self.Camera_Stopped_2.setGeometry(QtCore.QRect(575, 175, 150, 50))
+        self.Camera_Stopped_2.setObjectName("Camera_Stopped_2")
+        self.Camera_Stopped_2.setFont(font15)
+        self.Camera_Stopped_2.setStyleSheet("background-color:rgba(255,75,60,200);"
+                                    "color: white;"
+                                     "font-style:bold;"
+                                     )
+        self.Camera_Stopped_2.setAlignment(QtCore.Qt.AlignCenter)
+        self.Camera_Stopped_2.setVisible(False)
 
         #Blink Counter Area 2
         self.Blink_Face_2 = QtWidgets.QLabel(self.centralwidget)
@@ -394,11 +441,10 @@ class Ui_MainWindow(object):
 
         self.retranslateUi(MainWindow)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
-        self.capture1 = cv2.VideoCapture(1)
-        self.capture2 = cv2.VideoCapture(0)
+
 
         
-        self.cameras=[self.capture1, self.capture2]
+        
         self.camera_labels=[self.cam_label1, self.cam_label2]
         self.face_frames=[self.face_frame1, self.face_frame2]
 
@@ -441,171 +487,191 @@ class Ui_MainWindow(object):
             
 
 
-    def viewCam(self, cam_index):
+    def viewCam(self):
         _translate = QtCore.QCoreApplication.translate
-        
-        self.recordBTN.setIcon(QIcon("./imgs/stop.png"))
-        self.recordBTN.setToolTip("Stop Face Recognition")
-        self.recordBTN.setText(_translate("MainWindow", " Stop Capture"))
 
         self.EYE_AR_THRESH = 0.15
         self.COUNTER = 0
-        frame_rate = 10
-        prev = 0
-        
+
         
         (lStart, lEnd) = face_utils.FACIAL_LANDMARKS_IDXS["left_eye"]
         (rStart, rEnd) = face_utils.FACIAL_LANDMARKS_IDXS["right_eye"]
 
-        while True:
-            stime = time.time()
-            # Capture frame-by-frame
-            time_elapsed = time.time() - prev
+        self.capture1 = cv2.VideoCapture(1)
+        self.capture2 = cv2.VideoCapture(0)
+        self.cameras=[self.capture1, self.capture2]
+        self.recordBTN.setVisible(False)
+        self.stopBTN.setVisible(True)
+        self.Camera_Stopped_1.setVisible(False)
+        self.Camera_Stopped_2.setVisible(False)
+        self.No_Face_1.setVisible(True)
+        self.No_Face_2.setVisible(True)
+
+        while hasattr(self.capture1, 'read'):
             ret1, frame1 = self.cameras[0].read()
             ret2, frame2 = self.cameras[1].read()
-            #if time_elapsed > 1. / frame_rate:
-            #    prev = time.time()
-
-            gray1 = cv2.cvtColor(frame1, cv2.COLOR_BGR2GRAY)
-            gray2 = cv2.cvtColor(frame2, cv2.COLOR_BGR2GRAY)
-
-            rects1 = detector(gray1, 0)
-            rects2 = detector(gray2, 0)
             
-            image1= cv2.cvtColor(frame1, cv2.COLOR_BGR2RGB)
-            image2= cv2.cvtColor(frame2, cv2.COLOR_BGR2RGB)
-
+            print('=================================')
+            print(type(frame1))
+            print(np.shape(frame1))
             
-            height1, width1, channel1 = image1.shape
-            height2, width2, channel2 = image2.shape
+            print('=================================')
+            print(type(frame2))
+            print(np.shape(frame2))
+            if frame1 is None:
+                self.camera_labels[0].setPixmap(QPixmap.fromImage(qImg1))
+                self.camera_labels[1].setPixmap(QPixmap.fromImage(qImg2))
+                break
+            else: 
 
-            step1 = channel1 * width1
-            step2 = channel2 * width2
+                gray1 = cv2.cvtColor(frame1, cv2.COLOR_BGR2GRAY)
+                gray2 = cv2.cvtColor(frame2, cv2.COLOR_BGR2GRAY)
 
-            qImg1 = QImage(image1.data, width1, height1, step1, QImage.Format_RGB888)
-            qImg2 = QImage(image2.data, width2, height2, step2, QImage.Format_RGB888)
-            
+                rects1 = detector(gray1, 0)
+                rects2 = detector(gray2, 0)
+                
+                image1= cv2.cvtColor(frame1, cv2.COLOR_BGR2RGB)
+                image2= cv2.cvtColor(frame2, cv2.COLOR_BGR2RGB)
 
-            # Draw a rectangle around the faces (Camera 1)
-            if len(rects1)!=0:
-                self.No_Face_1.setVisible(True)
-                self.No_Face_1.setStyleSheet(
-                                    "background-color:rgba(3,174,80,200);"
-                                     "font-style:bold;"
-                                     "color: white;"
-                                     )
-                self.No_Face_1.setText("Face Detected")
-                for rect1 in rects1: 
-                    x1,y1,w1,h1= convert_and_trim_bb(gray1, rect1) 
-                    cv2.rectangle(image1, (x1, y1), (x1 + w1, y1 + h1), (255, 0, 0), 2)
-            else:
-                self.No_Face_1.setStyleSheet(
-                                    "background-color:rgba(255,75,60,200);"
-                                     "font-style:bold;"
-                                     "color: white;"
-                                     )
-                self.No_Face_1.setText("No Face Detected")
-                self.No_Face_1.setVisible(True)
+                
+                height1, width1, channel1 = image1.shape
+                height2, width2, channel2 = image2.shape
+
+                step1 = channel1 * width1
+                step2 = channel2 * width2
+
+                qImg1 = QImage(image1.data, width1, height1, step1, QImage.Format_RGB888)
+                qImg2 = QImage(image2.data, width2, height2, step2, QImage.Format_RGB888)
                 
 
-            
-            # Draw a rectangle around the faces (Camera 2)
-            if len(rects2)!=0:
-                self.No_Face_2.setVisible(True)
-                self.No_Face_2.setStyleSheet(
-                                    "background-color:rgba(3,174,80,200);"
-                                     "font-style:bold;"
-                                     "color: white;"
-                                     )
-                self.No_Face_2.setText("Face Detected")
-                for rect2 in rects2:
-                    x2,y2,w2,h2= convert_and_trim_bb(gray2, rect2) 
-                    cv2.rectangle(image2, (x2, y2), (x2 + w2, y2 + h2), (0, 255, 0), 2)
-
-                    shape2 = predictor(gray2, rect2)
-                    shape2 = face_utils.shape_to_np(shape2)
-
-                    leftEye = shape2[lStart:lEnd]
-                    rightEye = shape2[rStart:rEnd]
-                    leftEAR = eye_aspect_ratio(leftEye)
-                    rightEAR = eye_aspect_ratio(rightEye)
-
-                    ear = (leftEAR + rightEAR) / 2.0
-
-                    leftEyeHull = cv2.convexHull(leftEye)
-                    rightEyeHull = cv2.convexHull(rightEye)
-                    cv2.drawContours(image2, [leftEyeHull], -1, (0, 255, 0), 1)
-                    cv2.drawContours(image2, [rightEyeHull], -1, (0, 255, 0), 1)
-
+                # Draw a rectangle around the faces (Camera 1)
+                if len(rects1)!=0:
+                    self.No_Face_1.setVisible(True)
+                    self.No_Face_1.setStyleSheet(
+                                        "background-color:rgba(3,174,80,200);"
+                                        "font-style:bold;"
+                                        "color: white;"
+                                        )
+                    self.No_Face_1.setText("Face Detected")
+                    for rect1 in rects1: 
+                        x1,y1,w1,h1= convert_and_trim_bb(gray1, rect1) 
+                        cv2.rectangle(image1, (x1, y1), (x1 + w1, y1 + h1), (255, 0, 0), 2)
+                else:
+                    self.No_Face_1.setStyleSheet(
+                                        "background-color:rgba(255,75,60,200);"
+                                        "font-style:bold;"
+                                        "color: white;"
+                                        )
+                    self.No_Face_1.setText("No Face Detected")
+                    self.No_Face_1.setVisible(True)
                     
 
-                    if self.anti_spoofing.isChecked():
-                        self.Blink_Face_2.setVisible(True)
-                        self.Blink_Face_2.setText("Blink {} times".format(3))
-                        if ear < self.EYE_AR_THRESH:
-                            self.COUNTER += 1
-                            self.Blink_Face_2.setText("Blink {} times".format(3-self.COUNTER))
-                            time.sleep(0.099)
+                
+                # Draw a rectangle around the faces (Camera 2)
+                if len(rects2)!=0:
+                    self.No_Face_2.setVisible(True)
+                    self.No_Face_2.setStyleSheet(
+                                        "background-color:rgba(3,174,80,200);"
+                                        "font-style:bold;"
+                                        "color: white;"
+                                        )
+                    self.No_Face_2.setText("Face Detected")
+                    for rect2 in rects2:
+                        x2,y2,w2,h2= convert_and_trim_bb(gray2, rect2) 
+                        cv2.rectangle(image2, (x2, y2), (x2 + w2, y2 + h2), (0, 255, 0), 2)
 
-                        if self.COUNTER >= 3:
-                            self.Blink_Face_2.setVisible(False)
-                            self.take_pic.setEnabled(False)
-                            self.EAR_label.setText("Anti-spoofing \n Passed")
-                            self.EAR_label.setStyleSheet("color: green;"
-                            "border: 1px solid white;"
-                            "font-style:bold;")
-                            self.blink_count.setText("Blinks \n Passed")
-                            self.blink_count.setStyleSheet("color: green;"
-                            "border: 1px solid white;"
-                            "font-style:bold;") 
-                            if len(rects1)!=0 and len(rects2)!=0:
-                                self.take_pic.setEnabled(True)
+                        shape2 = predictor(gray2, rect2)
+                        shape2 = face_utils.shape_to_np(shape2)
+
+                        leftEye = shape2[lStart:lEnd]
+                        rightEye = shape2[rStart:rEnd]
+                        leftEAR = eye_aspect_ratio(leftEye)
+                        rightEAR = eye_aspect_ratio(rightEye)
+
+                        ear = (leftEAR + rightEAR) / 2.0
+
+                        leftEyeHull = cv2.convexHull(leftEye)
+                        rightEyeHull = cv2.convexHull(rightEye)
+                        cv2.drawContours(image2, [leftEyeHull], -1, (0, 255, 0), 1)
+                        cv2.drawContours(image2, [rightEyeHull], -1, (0, 255, 0), 1)
+
+                        
+
+                        if self.anti_spoofing.isChecked():
+                            self.Blink_Face_2.setVisible(True)
+                            self.Blink_Face_2.setText("Blink {} times".format(3))
+                            if ear < self.EYE_AR_THRESH:
+                                self.COUNTER += 1
+                                self.Blink_Face_2.setText("Blink {} times".format(3-self.COUNTER))
+                                time.sleep(0.099)
+
+                            if self.COUNTER >= 3:
+                                self.Blink_Face_2.setVisible(False)
+                                self.take_pic.setEnabled(False)
+                                self.EAR_label.setText("Anti-spoofing \n Passed")
+                                self.EAR_label.setStyleSheet("color: green;"
+                                "border: 1px solid white;"
+                                "font-style:bold;")
+                                self.blink_count.setText("Blinks \n Passed")
+                                self.blink_count.setStyleSheet("color: green;"
+                                "border: 1px solid white;"
+                                "font-style:bold;") 
+                                if len(rects1)!=0 and len(rects2)!=0:
+                                    self.take_pic.setEnabled(True)
+                                else:
+                                    self.take_pic.setEnabled(False) 
+                                
                             else:
-                                self.take_pic.setEnabled(False) 
-                            
-                        else:
-                            self.take_pic.setEnabled(False)
-                            self.EAR_label.setText("Anti-spoofing \n Enabled")
-                            self.EAR_label.setStyleSheet("color: red;"
+                                self.take_pic.setEnabled(False)
+                                self.EAR_label.setText("Anti-spoofing \n Enabled")
+                                self.EAR_label.setStyleSheet("color: red;"
+                                "border: 1px solid white;"
+                                "font-style:bold;")
+                                self.blink_count.setText("Blinks \n {}".format(self.COUNTER))
+                                
+                        else :
+                            self.Blink_Face_2.setVisible(False)
+                            self.EAR_label.setText("Anti-spoofing \n Disabled")
+                            self.EAR_label.setStyleSheet("color: white;"
                             "border: 1px solid white;"
                             "font-style:bold;")
-                            self.blink_count.setText("Blinks \n {}".format(self.COUNTER))
-                               
-                    else :
-                        self.Blink_Face_2.setVisible(False)
-                        self.EAR_label.setText("Anti-spoofing \n Disabled")
-                        self.EAR_label.setStyleSheet("color: white;"
-                        "border: 1px solid white;"
-                        "font-style:bold;")
-                        self.blink_count.setText("Anti-spoofing \n Disabled")
-                        self.blink_count.setStyleSheet("color: white;"
-                        "border: 1px solid white;"
-                        "font-style:bold;")
-                        if len(rects1)!=0 and len(rects2)!=0:
-                                self.take_pic.setEnabled(True)
-                        else:
-                                self.take_pic.setEnabled(False) 
+                            self.blink_count.setText("Anti-spoofing \n Disabled")
+                            self.blink_count.setStyleSheet("color: white;"
+                            "border: 1px solid white;"
+                            "font-style:bold;")
+                            if len(rects1)!=0 and len(rects2)!=0:
+                                    self.take_pic.setEnabled(True)
+                            else:
+                                    self.take_pic.setEnabled(False) 
 
-                    
-            else:
-                self.No_Face_2.setStyleSheet(
-                                    "background-color:rgba(255,75,60,200);"
-                                     "font-style:bold;"
-                                     "color: white;"
-                                     )
-                self.No_Face_2.setText("No Face Detected")
-                self.No_Face_2.setVisible(True)
+                        
+                else:
+                    self.No_Face_2.setStyleSheet(
+                                        "background-color:rgba(255,75,60,200);"
+                                        "font-style:bold;"
+                                        "color: white;"
+                                        )
+                    self.No_Face_2.setText("No Face Detected")
+                    self.No_Face_2.setVisible(True)
 
-            
+                
 
-            self.camera_labels[0].setPixmap(QPixmap.fromImage(qImg1))
-            self.camera_labels[1].setPixmap(QPixmap.fromImage(qImg2))
+                self.camera_labels[0].setPixmap(QPixmap.fromImage(qImg1))
+                self.camera_labels[1].setPixmap(QPixmap.fromImage(qImg2))
 
 
-            if cv2.waitKey(0) & 0xFF == ord('z'):
-                break
+                if cv2.waitKey(0) & 0xFF == ord('z'):
+                    break
     
-
+    def stopVideo(self):
+        self.capture1.release()
+        self.capture2.release()
+        self.Camera_Stopped_1.setVisible(True)
+        self.Camera_Stopped_2.setVisible(True)
+        self.No_Face_1.setVisible(False)
+        self.No_Face_2.setVisible(False)
+        self.recordBTN.setVisible(True)
+        self.stopBTN.setVisible(False)
 
     def capture_image(self, cam_index):
         
@@ -913,9 +979,7 @@ class Ui_MainWindow(object):
                                        "font-style:bold;"
                                        )
 
-    def stopVideo(self):
-        self.viewCam(1)
-        print("capture stopped")
+
 
     def changeLanguage(self):
         if self.actionFrancais.isChecked():
@@ -929,8 +993,11 @@ class Ui_MainWindow(object):
         _translate = QtCore.QCoreApplication.translate
         MainWindow.setWindowTitle(_translate("MainWindow", " FRekoAccess"))
         self.recordBTN.setText(_translate("MainWindow", "Open Cameras"))
+        self.stopBTN.setText(_translate("MainWindow", "Stop Cameras"))
         self.cam_label1.setText(_translate("MainWindow", "Camera Capture Frame 1"))
         self.cam_label2.setText(_translate("MainWindow", "Camera Capture Frame 2"))
+        self.Camera_Stopped_1.setText(_translate("MainWindow", "Camera 1 \n Stopped"))
+        self.Camera_Stopped_2.setText(_translate("MainWindow", "Camera 2 \n Stopped"))
         self.take_pic.setText(_translate("MainWindow", "Authenticate"))
         self.face_frame1.setText(_translate("MainWindow", "Frame \n 1"))
         self.face_frame2.setText(_translate("MainWindow", "Frame \n 2"))
@@ -938,10 +1005,7 @@ class Ui_MainWindow(object):
         self.blink_count.setText(_translate("MainWindow", "Blink \n Counter"))
         self.pred_class1.setText(_translate("MainWindow", "ID 1"))
         self.pred_class2.setText(_translate("MainWindow", "ID 2"))
-        #self.prenom.setText(_translate("MainWindow", "Prenom"))
         self.access_control.setText(_translate("MainWindow", "Access Control \n Decision"))
-        #self.subject_info.setText(_translate("MainWindow", " SUBJECT INFO"))
-        #self.open_csv.setText(_translate("MainWindow", "Open CSV File"))
         self.menuEnrolement.setTitle(_translate("MainWindow", "Enrollment"))
         self.menuSettings.setTitle(_translate("MainWindow", "Settings"))
         self.menuFace_recognition.setTitle(_translate("MainWindow", "Face recognition"))

@@ -25,7 +25,7 @@ import queue
 from tensorflow.keras.preprocessing.image import load_img,img_to_array
 from keras_vggface.vggface import VGGFace
 from keras_vggface import utils
-from utils import prediction_cosine_similarity2, findCosineDistance
+from utils import prediction_cosine_similarity2, findCosineDistance, convert_and_trim_bb
 import dlib
 
 from models import *
@@ -36,7 +36,6 @@ class Ui_enrolement_addNew(object):
         '''
         MAIN WINDOW - ENROLEMENT_ADDNEW
         '''
-
         #Define Fonts
         QtGui.QFontDatabase.addApplicationFont("./fonts/Play-Regular.ttf")
 
@@ -47,7 +46,7 @@ class Ui_enrolement_addNew(object):
 
         #Main Window
         enrolement_addNew.setObjectName("enrolement_addNew")
-        enrolement_addNew.resize(900, 500)
+        enrolement_addNew.resize(860, 830)
         enrolement_addNew.setStyleSheet("background-color: #1b1553;"
         "color: #ff4b3c;"
         "font-family: Play;"
@@ -58,74 +57,134 @@ class Ui_enrolement_addNew(object):
         #Central Widget
         self.centralwidget = QtWidgets.QWidget(enrolement_addNew)
         self.centralwidget.setObjectName("centralwidget")
-
-        #Frame Capture
-        self.frame = QtWidgets.QLabel(self.centralwidget)
-        self.frame.setGeometry(QtCore.QRect(420, 15, 451, 441))
-        self.frame.setFont(font21)
-        self.frame.setObjectName("frame")
-        self.frame.setStyleSheet("border: 1px solid white;"
+        
+        #Frame Capture 1
+        self.cam_label1 = QtWidgets.QLabel(self.centralwidget)
+        self.cam_label1.setGeometry(QtCore.QRect(15, 15, 400, 400))
+        self.cam_label1.setFont(font21)
+        self.cam_label1.setObjectName("cam_label1")
+        self.cam_label1.setStyleSheet("border: 1px solid white;"
                        "font-style:bold;"
                                      )
-        self.frame.setAlignment(QtCore.Qt.AlignCenter)
-        
-        #Taken Picture Areas
+        self.cam_label1.setAlignment(QtCore.Qt.AlignCenter)
 
-        #Frame 1 (Main Frame)
-        self.face_frame1 = QtWidgets.QLabel(self.centralwidget)
-        self.face_frame1.setGeometry(QtCore.QRect(15, 140, 170, 170 ))
-        self.face_frame1.setObjectName("face_frame1")
-        self.face_frame1.setScaledContents(True)
-        self.face_frame1.setFont(font4)
-        self.face_frame1.setStyleSheet("border: 1px solid white;"
+        #Frame Capture 2
+        self.cam_label2 = QtWidgets.QLabel(self.centralwidget)
+        self.cam_label2.setGeometry(QtCore.QRect(450, 15, 400, 400))
+        self.cam_label2.setFont(font21)
+        self.cam_label2.setObjectName("cam_label2")
+        self.cam_label2.setStyleSheet("border: 1px solid white;"
+                       "font-style:bold;"
+                                     )
+        self.cam_label2.setAlignment(QtCore.Qt.AlignCenter)
+        
+        #Taken Picture Areas 
+        #Frame 1_1 (Main Frame 1)
+        self.face_frame1_1 = QtWidgets.QLabel(self.centralwidget)
+        self.face_frame1_1.setGeometry(QtCore.QRect(230, 500, 185, 185 ))
+        self.face_frame1_1.setObjectName("face_frame1_1")
+        self.face_frame1_1.setScaledContents(True)
+        self.face_frame1_1.setFont(font4)
+        self.face_frame1_1.setStyleSheet("border: 1px solid white;"
                        "font-style:bold;"
                        )
-        self.face_frame1.setAlignment(QtCore.Qt.AlignCenter)
-        #Frame 2 
-        self.face_frame2 = QtWidgets.QLabel(self.centralwidget)
-        self.face_frame2.setGeometry(QtCore.QRect(15, 371, 85, 85 ))
-        self.face_frame2.setObjectName("face_frame2")
-        self.face_frame2.setScaledContents(True)
-        self.face_frame2.setFont(font4)
-        self.face_frame2.setStyleSheet("border: 1px solid white;"
+        self.face_frame1_1.setAlignment(QtCore.Qt.AlignCenter)
+        #Frame 1_2 
+        self.face_frame1_2 = QtWidgets.QLabel(self.centralwidget)
+        self.face_frame1_2.setGeometry(QtCore.QRect(130, 500, 85, 85 ))
+        self.face_frame1_2.setObjectName("face_frame1_2")
+        self.face_frame1_2.setScaledContents(True)
+        self.face_frame1_2.setFont(font4)
+        self.face_frame1_2.setStyleSheet("border: 1px solid white;"
                        "font-style:bold;"
                        )
-        self.face_frame2.setAlignment(QtCore.Qt.AlignCenter)
-        #Frame 3 
-        self.face_frame3 = QtWidgets.QLabel(self.centralwidget)
-        self.face_frame3.setGeometry(QtCore.QRect(115, 371, 85, 85 ))
-        self.face_frame3.setObjectName("face_frame3")
-        self.face_frame3.setScaledContents(True)
-        self.face_frame3.setFont(font4)
-        self.face_frame3.setStyleSheet("border: 1px solid white;"
+        self.face_frame1_2.setAlignment(QtCore.Qt.AlignCenter)
+        #Frame 1_3 
+        self.face_frame1_3 = QtWidgets.QLabel(self.centralwidget)
+        self.face_frame1_3.setGeometry(QtCore.QRect(30, 500, 85, 85 ))
+        self.face_frame1_3.setObjectName("face_frame1_3")
+        self.face_frame1_3.setScaledContents(True)
+        self.face_frame1_3.setFont(font4)
+        self.face_frame1_3.setStyleSheet("border: 1px solid white;"
                        "font-style:bold;"
                        )
-        self.face_frame3.setAlignment(QtCore.Qt.AlignCenter)
-        #Frame 4
-        self.face_frame4 = QtWidgets.QLabel(self.centralwidget)
-        self.face_frame4.setGeometry(QtCore.QRect(215, 371, 85, 85 ))
-        self.face_frame4.setObjectName("face_frame4")
-        self.face_frame4.setScaledContents(True)
-        self.face_frame4.setFont(font4)
-        self.face_frame4.setStyleSheet("border: 1px solid white;"
+        self.face_frame1_3.setAlignment(QtCore.Qt.AlignCenter)
+        #Frame 1_4
+        self.face_frame1_4 = QtWidgets.QLabel(self.centralwidget)
+        self.face_frame1_4.setGeometry(QtCore.QRect(130, 600, 85, 85 ))
+        self.face_frame1_4.setObjectName("face_frame1_4")
+        self.face_frame1_4.setScaledContents(True)
+        self.face_frame1_4.setFont(font4)
+        self.face_frame1_4.setStyleSheet("border: 1px solid white;"
                        "font-style:bold;"
                        )
-        self.face_frame4.setAlignment(QtCore.Qt.AlignCenter)
-        #Frame 5 
-        self.face_frame5 = QtWidgets.QLabel(self.centralwidget)
-        self.face_frame5.setGeometry(QtCore.QRect(315, 371, 85, 85 ))
-        self.face_frame5.setObjectName("face_frame5")
-        self.face_frame5.setScaledContents(True)
-        self.face_frame5.setFont(font4)
-        self.face_frame5.setStyleSheet("border: 1px solid white;"
+        self.face_frame1_4.setAlignment(QtCore.Qt.AlignCenter)
+        #Frame 1_5 
+        self.face_frame1_5 = QtWidgets.QLabel(self.centralwidget)
+        self.face_frame1_5.setGeometry(QtCore.QRect(30, 600, 85, 85 ))
+        self.face_frame1_5.setObjectName("face_frame1_5")
+        self.face_frame1_5.setScaledContents(True)
+        self.face_frame1_5.setFont(font4)
+        self.face_frame1_5.setStyleSheet("border: 1px solid white;"
                        "font-style:bold;"
                        )
-        self.face_frame5.setAlignment(QtCore.Qt.AlignCenter)
+        self.face_frame1_5.setAlignment(QtCore.Qt.AlignCenter)
+
+        #Frame 2_1 (Main Frame 2)
+        self.face_frame2_1 = QtWidgets.QLabel(self.centralwidget)
+        self.face_frame2_1.setGeometry(QtCore.QRect(450, 500, 185, 185 ))
+        self.face_frame2_1.setObjectName("face_frame2_1")
+        self.face_frame2_1.setScaledContents(True)
+        self.face_frame2_1.setFont(font4)
+        self.face_frame2_1.setStyleSheet("border: 1px solid white;"
+                       "font-style:bold;"
+                       )
+        self.face_frame2_1.setAlignment(QtCore.Qt.AlignCenter)
+        #Frame 2_2 
+        self.face_frame2_2 = QtWidgets.QLabel(self.centralwidget)
+        self.face_frame2_2.setGeometry(QtCore.QRect(650, 500, 85, 85 ))
+        self.face_frame2_2.setObjectName("face_frame2_2")
+        self.face_frame2_2.setScaledContents(True)
+        self.face_frame2_2.setFont(font4)
+        self.face_frame2_2.setStyleSheet("border: 1px solid white;"
+                       "font-style:bold;"
+                       )
+        self.face_frame2_2.setAlignment(QtCore.Qt.AlignCenter)
+        #Frame 2_3 
+        self.face_frame2_3 = QtWidgets.QLabel(self.centralwidget)
+        self.face_frame2_3.setGeometry(QtCore.QRect(750, 500, 85, 85 ))
+        self.face_frame2_3.setObjectName("face_frame2_3")
+        self.face_frame2_3.setScaledContents(True)
+        self.face_frame2_3.setFont(font4)
+        self.face_frame2_3.setStyleSheet("border: 1px solid white;"
+                       "font-style:bold;"
+                       )
+        self.face_frame2_3.setAlignment(QtCore.Qt.AlignCenter)
+        #Frame 2_4
+        self.face_frame2_4 = QtWidgets.QLabel(self.centralwidget)
+        self.face_frame2_4.setGeometry(QtCore.QRect(650, 600, 85, 85 ))
+        self.face_frame2_4.setObjectName("face_frame2_4")
+        self.face_frame2_4.setScaledContents(True)
+        self.face_frame2_4.setFont(font4)
+        self.face_frame2_4.setStyleSheet("border: 1px solid white;"
+                       "font-style:bold;"
+                       )
+        self.face_frame2_4.setAlignment(QtCore.Qt.AlignCenter)
+        #Frame 2_5 
+        self.face_frame2_5 = QtWidgets.QLabel(self.centralwidget)
+        self.face_frame2_5.setGeometry(QtCore.QRect(750, 600, 85, 85 ))
+        self.face_frame2_5.setObjectName("face_frame2_5")
+        self.face_frame2_5.setScaledContents(True)
+        self.face_frame2_5.setFont(font4)
+        self.face_frame2_5.setStyleSheet("border: 1px solid white;"
+                       "font-style:bold;"
+                       )
+        self.face_frame2_5.setAlignment(QtCore.Qt.AlignCenter)
 
 
         #Start Recording Button
         self.startBTN = QtWidgets.QPushButton(self.centralwidget)
-        self.startBTN.setGeometry(QtCore.QRect(45, 45, 142, 40))
+        self.startBTN.setGeometry(QtCore.QRect(285, 450, 142, 40))
         self.startBTN.setFont(font7)
         self.startBTN.setStyleSheet(
             "QPushButton::hover"
@@ -144,7 +203,7 @@ class Ui_enrolement_addNew(object):
 
         #Capture Button
         self.take_pic = QtWidgets.QPushButton(self.centralwidget)
-        self.take_pic.setGeometry(QtCore.QRect(200, 45, 148, 40))
+        self.take_pic.setGeometry(QtCore.QRect(430, 450, 142, 40))
         self.take_pic.setFont(font7)
         self.take_pic.setCursor(QCursor(QtCore.Qt.PointingHandCursor))
         self.take_pic.setIcon(QIcon("./imgs/cam.png"))
@@ -159,12 +218,12 @@ class Ui_enrolement_addNew(object):
         )
         self.take_pic.setObjectName("take_pic")
         
-        self.take_pic.hide()
+        self.take_pic.setEnabled(False)
         self.take_pic.clicked.connect(self.capture_image)
 
         #NameText (Class Name Input)
         self.class_name_input = QtWidgets.QLineEdit(self.centralwidget)
-        self.class_name_input.setGeometry(QtCore.QRect(205, 235, 200, 30))
+        self.class_name_input.setGeometry(QtCore.QRect(330, 700, 200, 30))
         self.class_name_input.setEnabled(False)
         self.class_name_input.setPlaceholderText('Enroll As (Last Name)')
         self.class_name_input.setStyleSheet("border: 1px solid white;"
@@ -175,7 +234,7 @@ class Ui_enrolement_addNew(object):
 
 
         self.enrolementBTN = QtWidgets.QPushButton(self.centralwidget)
-        self.enrolementBTN.setGeometry(QtCore.QRect(220, 275, 171, 35))
+        self.enrolementBTN.setGeometry(QtCore.QRect(345, 745, 170, 40))
         self.enrolementBTN.setEnabled(False)
         self.enrolementBTN.setObjectName("Enrolement Boutton")
         self.enrolementBTN.setStyleSheet(
@@ -224,33 +283,56 @@ class Ui_enrolement_addNew(object):
         self.capture = cv2.VideoCapture(1)
         
         self.enrolementBTN.clicked.connect(self.feature_extraction)
-        
+
+        self.camera_labels=[self.cam_label1, self.cam_label2] 
 
     def viewCam(self):
-        self.face_cascade = cv2.CascadeClassifier(FACE_DETECTION_MODELS+'haarcascade_frontalface_default.xml')
-        while True:
-            ret, frame = self.capture.read()
-            gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
-            image= cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+        self.capture1 = cv2.VideoCapture(1)
+        self.capture2 = cv2.VideoCapture(0)
+        self.cameras=[self.capture1, self.capture2]
 
-            faces = self.face_cascade.detectMultiScale(gray)
-            height, width, channel = image.shape
-            step = channel * width
+        while hasattr(self.capture1, 'read'):
+            ret1, frame1 = self.cameras[0].read()
+            ret2, frame2 = self.cameras[1].read()
 
-            qImg = QImage(image.data, width, height, step, QImage.Format_RGB888)
+            gray = cv2.cvtColor(frame1, cv2.COLOR_BGR2GRAY)
+            image= cv2.cvtColor(frame2, cv2.COLOR_BGR2RGB)
+
+            gray1 = cv2.cvtColor(frame1, cv2.COLOR_BGR2GRAY)
+            gray2 = cv2.cvtColor(frame2, cv2.COLOR_BGR2GRAY)
+
+            rects1 = detector(gray1, 0)
+            rects2 = detector(gray2, 0)
+                
+            image1= cv2.cvtColor(frame1, cv2.COLOR_BGR2RGB)
+            image2= cv2.cvtColor(frame2, cv2.COLOR_BGR2RGB)
+
+                
+            height1, width1, channel1 = image1.shape
+            height2, width2, channel2 = image2.shape
+
+            step1 = channel1 * width1
+            step2 = channel2 * width2
+
+            qImg1 = QImage(image1.data, width1, height1, step1, QImage.Format_RGB888)
+            qImg2 = QImage(image2.data, width2, height2, step2, QImage.Format_RGB888)
+
 
             # Draw a rectangle around the faces
-            for (x, y, w, h) in faces:
-                cv2.rectangle(image, (x, y), (x + w, y + h), (255, 0, 0), 2)
+            for rect1 in rects1: 
+                x1,y1,w1,h1= convert_and_trim_bb(gray, rect1) 
+                cv2.rectangle(image1, (x1, y1), (x1 + w1, y1 + h1), (255, 0, 0), 2)
 
-            self.frame.setPixmap(QPixmap.fromImage(qImg))
-            self.take_pic.show()
+            for rect2 in rects2:
+                x2,y2,w2,h2= convert_and_trim_bb(gray2, rect2) 
+                cv2.rectangle(image2, (x2, y2), (x2 + w2, y2 + h2), (0, 255, 0), 2)
+
+            self.camera_labels[0].setPixmap(QPixmap.fromImage(qImg1))
+            self.camera_labels[1].setPixmap(QPixmap.fromImage(qImg2))
+            
 
             if cv2.waitKey(0) & 0xFF == ord('z'):
                 break
-
-        self.capture.release()
-        cv2.destroyAllWindows()
 
 
 
@@ -272,7 +354,7 @@ class Ui_enrolement_addNew(object):
             os.mkdir(path)
         """
 
-        face_frames_labels = [self.face_frame1, self.face_frame2, self.face_frame3, self.face_frame4, self.face_frame5]
+        face_frames2_labels = [self.face_frame2_1, self.face_frame2_2, self.face_frame2_3, self.face_frame2_4, self.face_frame2_5]
         frame_number = 5
         #self.class_name_input.setEnabled(False)
         t_seconds=15
@@ -303,7 +385,7 @@ class Ui_enrolement_addNew(object):
                         step = channel * width
                         qImg = QImage(roi_color.data, width, height, step, QImage.Format_RGB888)
 
-                        face_frames_labels[count].setPixmap(QPixmap.fromImage(qImg))
+                        face_frames2_labels[count].setPixmap(QPixmap.fromImage(qImg))
                         #captured_img = cv2.imwrite(path + "frame-{}.jpg".format(count)  , roi_color)
                         ret, frame = self.capture.read()
                         time.sleep(2.0 - time.time() + start_time)
@@ -373,12 +455,18 @@ class Ui_enrolement_addNew(object):
     def retranslateUi(self, enrolement_addNew):
         _translate = QtCore.QCoreApplication.translate
         enrolement_addNew.setWindowTitle(_translate("enrolement_addNew", "Add New Person"))
-        self.frame.setText(_translate("enrolement_addNew", "Camera Capture Frame"))
-        self.face_frame1.setText(_translate("MainWindow", "Image \n 1"))
-        self.face_frame2.setText(_translate("MainWindow", "Image \n 2"))
-        self.face_frame3.setText(_translate("MainWindow", "Image \n 3"))
-        self.face_frame4.setText(_translate("MainWindow", "Image \n 4"))
-        self.face_frame5.setText(_translate("MainWindow", "Image \n 5"))
+        self.cam_label1.setText(_translate("enrolement_addNew", "Camera Capture Frame 1"))
+        self.cam_label2.setText(_translate("enrolement_addNew", "Camera Capture Frame 2"))
+        self.face_frame1_1.setText(_translate("MainWindow", "Image \n 1 \n (Camera 1)"))
+        self.face_frame1_2.setText(_translate("MainWindow", "Image \n 2"))
+        self.face_frame1_3.setText(_translate("MainWindow", "Image \n 3"))
+        self.face_frame1_4.setText(_translate("MainWindow", "Image \n 4"))
+        self.face_frame1_5.setText(_translate("MainWindow", "Image \n 5"))
+        self.face_frame2_1.setText(_translate("MainWindow", "Image \n 1 \n (Camera 2)"))
+        self.face_frame2_2.setText(_translate("MainWindow", "Image \n 2"))
+        self.face_frame2_3.setText(_translate("MainWindow", "Image \n 3"))
+        self.face_frame2_4.setText(_translate("MainWindow", "Image \n 4"))
+        self.face_frame2_5.setText(_translate("MainWindow", "Image \n 5"))
         self.take_pic.setText(_translate("enrolement_addNew", "Take Pictures"))
         self.startBTN.setText(_translate("enrolement_addNew", "Open Camera"))
         self.enrolementBTN.setText(_translate("enrolement_addNew", "Enroll"))

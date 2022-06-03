@@ -59,9 +59,6 @@ class Ui_MainWindow(object):
         self.centralwidget = QtWidgets.QWidget(MainWindow)
         self.centralwidget.setObjectName("centralwidget")
 
-        #Display Live FPS
-        self.show_fps = QtWidgets.QLabel(self.centralwidget)
-        self.show_fps.setGeometry(QtCore.QRect(750, 550, 75, 31))
 
         #Start Record Button 1
         self.recordBTN = QtWidgets.QPushButton(self.centralwidget)
@@ -133,7 +130,7 @@ class Ui_MainWindow(object):
         #Camera Live Recording Area 1
         self.cam_label1 = QtWidgets.QLabel(self.centralwidget)
         self.cam_label1.setGeometry(QtCore.QRect(15, 15, 400, 400))
-        self.cam_label1.setObjectName("cam_label")
+        self.cam_label1.setObjectName("cam_label1")
         self.cam_label1.setStyleSheet("border: 1px solid white;"
                                      "font-style:bold;"
                                      )
@@ -142,7 +139,7 @@ class Ui_MainWindow(object):
         #Camera Live Recording Area 2
         self.cam_label2 = QtWidgets.QLabel(self.centralwidget)
         self.cam_label2.setGeometry(QtCore.QRect(450, 15, 400, 400))
-        self.cam_label2.setObjectName("cam_label")
+        self.cam_label2.setObjectName("cam_label2")
         self.cam_label2.setStyleSheet("border: 1px solid white;"
                                      "font-style:bold;"
                                      )
@@ -462,6 +459,7 @@ class Ui_MainWindow(object):
         self.window.show()
 
     def openEnrolementAddNew(self):
+        self.stopVideo()
         self.window = QtWidgets.QMainWindow()
         self.ui = Ui_enrolement_addNew()
         self.ui.setupUi(self.window)
@@ -1006,7 +1004,6 @@ class Ui_MainWindow(object):
         self.menuDashboard.setTitle(_translate("MainWindow", "Dashboard"))
         self.actionAjouter_personne.setText(_translate("MainWindow", "New personnel"))
         self.dashboardWindow.setText(_translate("MainWindow", "Open Dashboard"))
-        self.show_fps.setText(_translate("MainWindow", ""))
         self.darkMode.setText(_translate("MainWindow", "Enable Light Mode"))
         self.menuLanguage.setTitle(_translate("MainWindow", "Language"))
         self.actionEnglish.setText(_translate("MainWindow", "English"))

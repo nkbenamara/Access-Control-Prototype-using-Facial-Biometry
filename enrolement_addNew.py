@@ -43,6 +43,7 @@ class Ui_enrolement_addNew(object):
         font21 = QtGui.QFont("Play", 21)
         font7 = QtGui.QFont("Play", 7)
         font4 = QtGui.QFont("Play", 4)
+        font15 = QtGui.QFont("Play",15)
 
         #Main Window
         enrolement_addNew.setObjectName("enrolement_addNew")
@@ -78,6 +79,29 @@ class Ui_enrolement_addNew(object):
                                      )
         self.cam_label2.setAlignment(QtCore.Qt.AlignCenter)
         
+        #NoFace Detected Area 1 
+        self.No_Face_1 = QtWidgets.QLabel(self.centralwidget)
+        self.No_Face_1.setGeometry(QtCore.QRect(140, 350, 150, 30))
+        self.No_Face_1.setObjectName("No_Face_1")
+        self.No_Face_1.setFont(font15)
+        self.No_Face_1.setStyleSheet("background-color:rgba(255,75,60,200);"
+                                    "color: white;"
+                                     "font-style:bold;"
+                                     )
+        self.No_Face_1.setAlignment(QtCore.Qt.AlignCenter)
+        self.No_Face_1.setVisible(False)
+        
+        #NoFace Detected Area 2
+        self.No_Face_2 = QtWidgets.QLabel(self.centralwidget)
+        self.No_Face_2.setGeometry(QtCore.QRect(575, 350, 150, 30))
+        self.No_Face_2.setObjectName("No_Face_2")
+        self.No_Face_2.setFont(font15)
+        self.No_Face_2.setStyleSheet("background-color:rgba(255,75,60,200);"
+                                    "color: white;"
+                                     "font-style:bold;"
+                                     )
+        self.No_Face_2.setAlignment(QtCore.Qt.AlignCenter)
+        self.No_Face_2.setVisible(False)
         #Taken Picture Areas 
         #Frame 1_1 (Main Frame 1)
         self.face_frame1_1 = QtWidgets.QLabel(self.centralwidget)
@@ -316,20 +340,61 @@ class Ui_enrolement_addNew(object):
 
             qImg1 = QImage(image1.data, width1, height1, step1, QImage.Format_RGB888)
             qImg2 = QImage(image2.data, width2, height2, step2, QImage.Format_RGB888)
+            
+            # Draw a rectangle around the faces (Camera 1)
+            if len(rects1)!=0:
+                self.No_Face_1.setVisible(True)
+                self.No_Face_1.setStyleSheet(
+                                        "background-color:rgba(3,174,80,200);"
+                                        "font-style:bold;"
+                                        "color: white;"
+                                        )
+                self.No_Face_1.setText("Face Detected")
+                
+                for rect1 in rects1: 
+                    x1,y1,w1,h1= convert_and_trim_bb(gray, rect1) 
+                    cv2.rectangle(image1, (x1, y1), (x1 + w1, y1 + h1), (255, 0, 0), 2)
+            else:
+                self.No_Face_1.setStyleSheet(
+                                        "background-color:rgba(255,75,60,200);"
+                                        "font-style:bold;"
+                                        "color: white;"
+                                        )
+                self.No_Face_1.setText("No Face Detected")
+                self.No_Face_1.setVisible(True)
 
+            # Draw a rectangle around the faces (Camera 2)
+            if len(rects2)!=0:
+                self.No_Face_2.setVisible(True)
+                self.No_Face_2.setStyleSheet(
+                                        "background-color:rgba(3,174,80,200);"
+                                        "font-style:bold;"
+                                        "color: white;"
+                                        )
+                self.No_Face_2.setText("Face Detected")
 
-            # Draw a rectangle around the faces
-            for rect1 in rects1: 
-                x1,y1,w1,h1= convert_and_trim_bb(gray, rect1) 
-                cv2.rectangle(image1, (x1, y1), (x1 + w1, y1 + h1), (255, 0, 0), 2)
+                for rect2 in rects2:
+                    x2,y2,w2,h2= convert_and_trim_bb(gray2, rect2) 
+                    cv2.rectangle(image2, (x2, y2), (x2 + w2, y2 + h2), (0, 255, 0), 2)
+            else:
+                self.No_Face_2.setStyleSheet(
+                                        "background-color:rgba(255,75,60,200);"
+                                        "font-style:bold;"
+                                        "color: white;"
+                                        )
+                self.No_Face_2.setText("No Face Detected")
+                self.No_Face_2.setVisible(True)
 
-            for rect2 in rects2:
-                x2,y2,w2,h2= convert_and_trim_bb(gray2, rect2) 
-                cv2.rectangle(image2, (x2, y2), (x2 + w2, y2 + h2), (0, 255, 0), 2)
+            if len(rects1)!=0 and len(rects2)!=0:
+                self.take_pic.setEnabled(True)
+            else:
+                self.take_pic.setEnabled(False) 
 
             self.camera_labels[0].setPixmap(QPixmap.fromImage(qImg1))
             self.camera_labels[1].setPixmap(QPixmap.fromImage(qImg2))
             
+                            # Draw a rectangle around the faces (Camera 1)
+
 
             if cv2.waitKey(0) & 0xFF == ord('z'):
                 break
@@ -338,6 +403,7 @@ class Ui_enrolement_addNew(object):
 
 
     def capture_image(self):
+        
         face_cascade = cv2.CascadeClassifier(FACE_DETECTION_MODELS+'haarcascade_frontalface_default.xml')
         ret, frame = self.capture.read()
         directory = self.class_name_input.text()
@@ -353,7 +419,7 @@ class Ui_enrolement_addNew(object):
         else:
             os.mkdir(path)
         """
-
+        face_frames1_labels = [self.face_frame1_1, self.face_frame1_2, self.face_frame1_3, self.face_frame1_4, self.face_frame1_5]
         face_frames2_labels = [self.face_frame2_1, self.face_frame2_2, self.face_frame2_3, self.face_frame2_4, self.face_frame2_5]
         frame_number = 5
         #self.class_name_input.setEnabled(False)

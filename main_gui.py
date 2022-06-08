@@ -509,150 +509,142 @@ class Ui_MainWindow(object):
             ret1, frame1 = self.cameras[0].read()
             ret2, frame2 = self.cameras[1].read()
             
-            if frame1 is None:
-                self.camera_labels[0].setPixmap(QPixmap.fromImage(qImg1))
-                self.camera_labels[1].setPixmap(QPixmap.fromImage(qImg2))
-                break
-            else: 
+ 
 
-                gray1 = cv2.cvtColor(frame1, cv2.COLOR_BGR2GRAY)
-                gray2 = cv2.cvtColor(frame2, cv2.COLOR_BGR2GRAY)
+            gray1 = cv2.cvtColor(frame1, cv2.COLOR_BGR2GRAY)
+            gray2 = cv2.cvtColor(frame2, cv2.COLOR_BGR2GRAY)
 
-                rects1 = detector(gray1, 0)
-                rects2 = detector(gray2, 0)
+            rects1 = detector(gray1, 0)
+            rects2 = detector(gray2, 0)
                 
-                image1= cv2.cvtColor(frame1, cv2.COLOR_BGR2RGB)
-                image2= cv2.cvtColor(frame2, cv2.COLOR_BGR2RGB)
+            image1= cv2.cvtColor(frame1, cv2.COLOR_BGR2RGB)
+            image2= cv2.cvtColor(frame2, cv2.COLOR_BGR2RGB)
 
                 
-                height1, width1, channel1 = image1.shape
-                height2, width2, channel2 = image2.shape
+            height1, width1, channel1 = image1.shape
+            height2, width2, channel2 = image2.shape
 
-                step1 = channel1 * width1
-                step2 = channel2 * width2
+            step1 = channel1 * width1
+            step2 = channel2 * width2
 
-                qImg1 = QImage(image1.data, width1, height1, step1, QImage.Format_RGB888)
-                qImg2 = QImage(image2.data, width2, height2, step2, QImage.Format_RGB888)
+            qImg1 = QImage(image1.data, width1, height1, step1, QImage.Format_RGB888)
+            qImg2 = QImage(image2.data, width2, height2, step2, QImage.Format_RGB888)
                 
 
-                # Draw a rectangle around the faces (Camera 1)
-                if len(rects1)!=0:
-                    self.No_Face_1.setVisible(True)
-                    self.No_Face_1.setStyleSheet(
+            # Draw a rectangle around the faces (Camera 1)
+            if len(rects1)!=0:
+                self.No_Face_1.setVisible(True)
+                self.No_Face_1.setStyleSheet(
                                         "background-color:rgba(3,174,80,200);"
                                         "font-style:bold;"
                                         "color: white;"
                                         )
-                    self.No_Face_1.setText("Face Detected")
-                    for rect1 in rects1: 
-                        x1,y1,w1,h1= convert_and_trim_bb(gray1, rect1) 
-                        cv2.rectangle(image1, (x1, y1), (x1 + w1, y1 + h1), (255, 0, 0), 2)
-                else:
-                    self.No_Face_1.setStyleSheet(
+                self.No_Face_1.setText("Face Detected")
+                for rect1 in rects1: 
+                    x1,y1,w1,h1= convert_and_trim_bb(gray1, rect1) 
+                    cv2.rectangle(image1, (x1, y1), (x1 + w1, y1 + h1), (255, 0, 0), 2)
+            else:
+                self.No_Face_1.setStyleSheet(
                                         "background-color:rgba(255,75,60,200);"
                                         "font-style:bold;"
                                         "color: white;"
                                         )
-                    self.No_Face_1.setText("No Face Detected")
-                    self.No_Face_1.setVisible(True)
-                    
-
+                self.No_Face_1.setText("No Face Detected")
+                self.No_Face_1.setVisible(True)
                 
-                # Draw a rectangle around the faces (Camera 2)
-                if len(rects2)!=0:
-                    self.No_Face_2.setVisible(True)
-                    self.No_Face_2.setStyleSheet(
+            # Draw a rectangle around the faces (Camera 2)
+            if len(rects2)!=0:
+                self.No_Face_2.setVisible(True)
+                self.No_Face_2.setStyleSheet(
                                         "background-color:rgba(3,174,80,200);"
                                         "font-style:bold;"
                                         "color: white;"
                                         )
-                    self.No_Face_2.setText("Face Detected")
-                    for rect2 in rects2:
-                        x2,y2,w2,h2= convert_and_trim_bb(gray2, rect2) 
-                        cv2.rectangle(image2, (x2, y2), (x2 + w2, y2 + h2), (0, 255, 0), 2)
+                self.No_Face_2.setText("Face Detected")
+                for rect2 in rects2:
+                    x2,y2,w2,h2= convert_and_trim_bb(gray2, rect2) 
+                    cv2.rectangle(image2, (x2, y2), (x2 + w2, y2 + h2), (0, 255, 0), 2)
 
-                        shape2 = predictor(gray2, rect2)
-                        shape2 = face_utils.shape_to_np(shape2)
+                    shape2 = predictor(gray2, rect2)
+                    shape2 = face_utils.shape_to_np(shape2)
 
-                        leftEye = shape2[lStart:lEnd]
-                        rightEye = shape2[rStart:rEnd]
-                        leftEAR = eye_aspect_ratio(leftEye)
-                        rightEAR = eye_aspect_ratio(rightEye)
+                    leftEye = shape2[lStart:lEnd]
+                    rightEye = shape2[rStart:rEnd]
+                    leftEAR = eye_aspect_ratio(leftEye)
+                    rightEAR = eye_aspect_ratio(rightEye)
 
-                        ear = (leftEAR + rightEAR) / 2.0
+                    ear = (leftEAR + rightEAR) / 2.0
 
-                        leftEyeHull = cv2.convexHull(leftEye)
-                        rightEyeHull = cv2.convexHull(rightEye)
-                        cv2.drawContours(image2, [leftEyeHull], -1, (0, 255, 0), 1)
-                        cv2.drawContours(image2, [rightEyeHull], -1, (0, 255, 0), 1)
+                    leftEyeHull = cv2.convexHull(leftEye)
+                    rightEyeHull = cv2.convexHull(rightEye)
+                    cv2.drawContours(image2, [leftEyeHull], -1, (0, 255, 0), 1)
+                    cv2.drawContours(image2, [rightEyeHull], -1, (0, 255, 0), 1)
 
-                        
+                    if self.anti_spoofing.isChecked():
+                        self.Blink_Face_2.setVisible(True)
+                        self.Blink_Face_2.setText("Blink {} times".format(3))
+                        if ear < self.EYE_AR_THRESH:
+                            self.COUNTER += 1
+                            self.Blink_Face_2.setText("Blink {} times".format(3-self.COUNTER))
+                            time.sleep(0.099)
 
-                        if self.anti_spoofing.isChecked():
-                            self.Blink_Face_2.setVisible(True)
-                            self.Blink_Face_2.setText("Blink {} times".format(3))
-                            if ear < self.EYE_AR_THRESH:
-                                self.COUNTER += 1
-                                self.Blink_Face_2.setText("Blink {} times".format(3-self.COUNTER))
-                                time.sleep(0.099)
-
-                            if self.COUNTER >= 3:
-                                self.Blink_Face_2.setVisible(False)
-                                self.take_pic.setEnabled(False)
-                                self.EAR_label.setText("Anti-spoofing \n Passed")
-                                self.EAR_label.setStyleSheet("color: green;"
+                        if self.COUNTER >= 3:
+                            self.Blink_Face_2.setVisible(False)
+                            self.take_pic.setEnabled(False)
+                            self.EAR_label.setText("Anti-spoofing \n Passed")
+                            self.EAR_label.setStyleSheet("color: green;"
                                 "border: 1px solid white;"
                                 "font-style:bold;")
-                                self.blink_count.setText("Blinks \n Passed")
-                                self.blink_count.setStyleSheet("color: green;"
+                            self.blink_count.setText("Blinks \n Passed")
+                            self.blink_count.setStyleSheet("color: green;"
                                 "border: 1px solid white;"
                                 "font-style:bold;") 
-                                if len(rects1)!=0 and len(rects2)!=0:
-                                    self.take_pic.setEnabled(True)
-                                else:
-                                    self.take_pic.setEnabled(False) 
-                                
+                            if len(rects1)!=0 and len(rects2)!=0:
+                                self.take_pic.setEnabled(True)
                             else:
-                                self.take_pic.setEnabled(False)
-                                self.EAR_label.setText("Anti-spoofing \n Enabled")
-                                self.EAR_label.setStyleSheet("color: red;"
+                                self.take_pic.setEnabled(False) 
+                                
+                        else:
+                            self.take_pic.setEnabled(False)
+                            self.EAR_label.setText("Anti-spoofing \n Enabled")
+                            self.EAR_label.setStyleSheet("color: red;"
                                 "border: 1px solid white;"
                                 "font-style:bold;")
-                                self.blink_count.setText("Blinks \n {}".format(self.COUNTER))
+                            self.blink_count.setText("Blinks \n {}".format(self.COUNTER))
                                 
-                        else :
-                            self.Blink_Face_2.setVisible(False)
-                            self.EAR_label.setText("Anti-spoofing \n Disabled")
-                            self.EAR_label.setStyleSheet("color: white;"
+                    else :
+                        self.Blink_Face_2.setVisible(False)
+                        self.EAR_label.setText("Anti-spoofing \n Disabled")
+                        self.EAR_label.setStyleSheet("color: white;"
                             "border: 1px solid white;"
                             "font-style:bold;")
-                            self.blink_count.setText("Anti-spoofing \n Disabled")
-                            self.blink_count.setStyleSheet("color: white;"
+                        self.blink_count.setText("Anti-spoofing \n Disabled")
+                        self.blink_count.setStyleSheet("color: white;"
                             "border: 1px solid white;"
                             "font-style:bold;")
-                            if len(rects1)!=0 and len(rects2)!=0:
-                                    self.take_pic.setEnabled(True)
-                            else:
-                                    self.take_pic.setEnabled(False) 
+                        if len(rects1)!=0 and len(rects2)!=0:
+                            self.take_pic.setEnabled(True)
+                        else:
+                            self.take_pic.setEnabled(False) 
 
                         
-                else:
-                    self.No_Face_2.setStyleSheet(
+            else:
+                self.No_Face_2.setStyleSheet(
                                         "background-color:rgba(255,75,60,200);"
                                         "font-style:bold;"
                                         "color: white;"
                                         )
-                    self.No_Face_2.setText("No Face Detected")
-                    self.No_Face_2.setVisible(True)
+                self.No_Face_2.setText("No Face Detected")
+                self.No_Face_2.setVisible(True)
 
                 
 
-                self.camera_labels[0].setPixmap(QPixmap.fromImage(qImg1))
-                self.camera_labels[1].setPixmap(QPixmap.fromImage(qImg2))
+            self.camera_labels[0].setPixmap(QPixmap.fromImage(qImg1))
+            self.camera_labels[1].setPixmap(QPixmap.fromImage(qImg2))
 
 
-                if cv2.waitKey(0) & 0xFF == ord('z'):
-                    break
+            if cv2.waitKey(0) & 0xFF == ord('z'):
+                break
     
     def stopVideo(self):
         self.capture1.release()

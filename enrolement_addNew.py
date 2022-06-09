@@ -18,6 +18,7 @@ import string
 import os
 from glob import glob
 import numpy as np
+import asyncio
 
 #import pycuda.autoinit
 import time
@@ -244,7 +245,7 @@ class Ui_enrolement_addNew(object):
         
         self.take_pic.setEnabled(False)
         self.take_pic.clicked.connect(self.capture_image)
-
+        
         #NameText (Class Name Input)
         self.class_name_input = QtWidgets.QLineEdit(self.centralwidget)
         self.class_name_input.setGeometry(QtCore.QRect(330, 700, 200, 30))
@@ -316,11 +317,10 @@ class Ui_enrolement_addNew(object):
         self.cameras=[self.capture1, self.capture2]
 
         while hasattr(self.capture1, 'read'):
+
             ret1, frame1 = self.cameras[0].read()
             ret2, frame2 = self.cameras[1].read()
 
-            gray = cv2.cvtColor(frame1, cv2.COLOR_BGR2GRAY)
-            image= cv2.cvtColor(frame2, cv2.COLOR_BGR2RGB)
 
             gray1 = cv2.cvtColor(frame1, cv2.COLOR_BGR2GRAY)
             gray2 = cv2.cvtColor(frame2, cv2.COLOR_BGR2GRAY)
@@ -330,8 +330,7 @@ class Ui_enrolement_addNew(object):
                 
             image1= cv2.cvtColor(frame1, cv2.COLOR_BGR2RGB)
             image2= cv2.cvtColor(frame2, cv2.COLOR_BGR2RGB)
-
-                
+     
             height1, width1, channel1 = image1.shape
             height2, width2, channel2 = image2.shape
 
@@ -352,7 +351,7 @@ class Ui_enrolement_addNew(object):
                 self.No_Face_1.setText("Face Detected")
                 
                 for rect1 in rects1: 
-                    x1,y1,w1,h1= convert_and_trim_bb(gray, rect1) 
+                    x1,y1,w1,h1= convert_and_trim_bb(gray1, rect1) 
                     cv2.rectangle(image1, (x1, y1), (x1 + w1, y1 + h1), (255, 0, 0), 2)
             else:
                 self.No_Face_1.setStyleSheet(
@@ -404,70 +403,44 @@ class Ui_enrolement_addNew(object):
 
     def capture_image(self):
         
-        face_cascade = cv2.CascadeClassifier(FACE_DETECTION_MODELS+'haarcascade_frontalface_default.xml')
-        ret, frame = self.capture.read()
-        directory = self.class_name_input.text()
-        path = GALLERY_IMAGES_PATH+ str(directory) + "/"
-        """
-                if os.path.isdir(path):
-            print("Path Already Exists...")
-            print("Removing " + str(directory))
-            shutil.rmtree(GALLERY_IMAGES_PATH+"{}".format(str(directory)), ignore_errors=True)
-            print(str(directory) + 'Has been removed')
-            print("Creating New folder named : " + str(directory))
-            os.mkdir(path)
-        else:
-            os.mkdir(path)
-        """
         face_frames1_labels = [self.face_frame1_1, self.face_frame1_2, self.face_frame1_3, self.face_frame1_4, self.face_frame1_5]
         face_frames2_labels = [self.face_frame2_1, self.face_frame2_2, self.face_frame2_3, self.face_frame2_4, self.face_frame2_5]
-        frame_number = 5
-        #self.class_name_input.setEnabled(False)
-        t_seconds=15
+
         count = 0
 
-        while ret:
-            start_time = time.time()
+        while True and count <5:
 
-            gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
-            frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-            faces = face_cascade.detectMultiScale(gray, 1.3, 5)
-            print(faces)
-            print(type(faces))
-            print('===========================')
-            try:
-                if type(faces)==tuple:
-                    break
-                else: 
-                    for (x, y, w, h) in faces:
-                        
-                        roi_color = frame[y:y + h, x:x + w]
-                        if count ==0:
-                            roi_color= cv2.resize(roi_color, (170,170), interpolation=cv2.INTER_CUBIC)
-                        else :
-                            roi_color= cv2.resize(roi_color, (85,85), interpolation=cv2.INTER_CUBIC)
-                        height, width, channel = roi_color.shape
-                        print(roi_color.shape)
-                        step = channel * width
-                        qImg = QImage(roi_color.data, width, height, step, QImage.Format_RGB888)
+            ret1, frame1 = self.cameras[0].read()
+            ret2, frame2 = self.cameras[1].read()
 
-                        face_frames2_labels[count].setPixmap(QPixmap.fromImage(qImg))
-                        #captured_img = cv2.imwrite(path + "frame-{}.jpg".format(count)  , roi_color)
-                        ret, frame = self.capture.read()
-                        time.sleep(2.0 - time.time() + start_time)
-                        count += 1
-                        '''
-                        if count == 25 or count == 40:
-                            self.notif.setText("Please change position")
-                            self.notif.setStyleSheet("""color : white;""")
-
-                        print("Picture " + str(count) + " Saved successfully")
-                        '''
+            print("count : {}".format(count))
+            print("=====================")
+            gray1 = cv2.cvtColor(frame1, cv2.COLOR_BGR2GRAY)
+            gray2 = cv2.cvtColor(frame2, cv2.COLOR_BGR2GRAY)
+            
+            rects1 = detector(gray1, 0)
+            rects2 = detector(gray2, 0)
+            for rect1 in rects1:
+                x1,y1,w1,h1= convert_and_trim_bb(gray1, rect1)
+                roi_color1 = frame1[y1:y1 + h1, x1:x1 + w1]
+                
+            for rect2 in rects2:
+                x2,y2,w2,h2= convert_and_trim_bb(gray2, rect2)
+                roi_color2 = frame2[y2:y2 + h2, x2:x2 + w2]
                     
-            except:
-                pass
-            if count == frame_number:
-                break
+            
+            img1=cv2.cvtColor(roi_color1, cv2.COLOR_BGR2RGB)
+            qImg1 = QImage(img1, w1, h1, 3*w1, QImage.Format_RGB888)
+            face_frames1_labels[count].setPixmap(QPixmap.fromImage(qImg1))
+                
+            img2=cv2.cvtColor(roi_color2, cv2.COLOR_BGR2RGB)
+            qImg2 = QImage(img2, w2, h2, 3*w2, QImage.Format_RGB888)
+            face_frames2_labels[count].setPixmap(QPixmap.fromImage(qImg2))
+                
+            count+=1
+
+            time.sleep(2)
+  
         self.viewCam()
 
 

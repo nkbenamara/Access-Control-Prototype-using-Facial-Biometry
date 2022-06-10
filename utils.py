@@ -292,7 +292,7 @@ def load_actual_collaborators():
     This function shows all available collaborators in the gallery
     '''
     try: 
-        y_train=np.load(GALLERY_PATH+'y_train.npy')
+        y_train=np.load(GALLERY_PATH+'y_train_camera1.npy')
     except:
         print('This model is not recognized.')
         return None

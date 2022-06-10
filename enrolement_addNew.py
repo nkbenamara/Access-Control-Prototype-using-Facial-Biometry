@@ -406,7 +406,8 @@ class Ui_enrolement_addNew(object):
         
         face_frames1_labels = [self.face_frame1_1, self.face_frame1_2, self.face_frame1_3, self.face_frame1_4, self.face_frame1_5]
         face_frames2_labels = [self.face_frame2_1, self.face_frame2_2, self.face_frame2_3, self.face_frame2_4, self.face_frame2_5]
-
+        self.images_camera1=[]
+        self.images_camera2=[]
         count = 0
 
         while True and count <5:
@@ -431,10 +432,13 @@ class Ui_enrolement_addNew(object):
                     
             
             img1=cv2.cvtColor(roi_color1, cv2.COLOR_BGR2RGB)
+            self.images_camera1.append(cv2.resize(img1, (224, 224),interpolation=cv2.INTER_AREA))
             qImg1 = QImage(img1, w1, h1, 3*w1, QImage.Format_RGB888)
             face_frames1_labels[count].setPixmap(QPixmap.fromImage(qImg1))
-                
+            
+            
             img2=cv2.cvtColor(roi_color2, cv2.COLOR_BGR2RGB)
+            self.images_camera2.append(cv2.resize(img2, (224, 224),interpolation=cv2.INTER_AREA))
             qImg2 = QImage(img2, w2, h2, 3*w2, QImage.Format_RGB888)
             face_frames2_labels[count].setPixmap(QPixmap.fromImage(qImg2))
                 
@@ -452,43 +456,82 @@ class Ui_enrolement_addNew(object):
     def feature_extraction(self):
 
         name = self.class_name_input.text()
-        image_list = []
-        feature_vectors = []
-        labels = []
-        images = glob(GALLERY_IMAGES_PATH + str(name) + "/"+ "*.jpg")
-        file_x_train = GALLERY_PATH+'x_train.npy'
-        file_y_train = GALLERY_PATH+'y_train.npy'
-        x_train = np.load(file_x_train)
-        y_train = np.load(file_y_train)
+        os.makedirs(GALLERY_IMAGES_PATH +'Camera1/'+ str(name).capitalize(), exist_ok=True)
+        os.makedirs(GALLERY_IMAGES_PATH + 'Camera2/'+ str(name).capitalize(), exist_ok=True)
+
+        
+        feature_vectors_camera1 = []
+        feature_vectors_camera2 = []
+        labels_camera1 = []
+        labels_camera2 = []
+        
+
+        file_x_train_camera1 = GALLERY_PATH+'x_train_camera1.npy'
+        file_y_train_camera1 = GALLERY_PATH+'y_train_camera1.npy'
+
+        file_x_train_camera2 = GALLERY_PATH+'x_train_camera2.npy'
+        file_y_train_camera2 = GALLERY_PATH+'y_train_camera2.npy'
+
+        x_train_camera1 = np.load(file_x_train_camera1)
+        y_train_camera1 = np.load(file_y_train_camera1)
+
+        x_train_camera2 = np.load(file_x_train_camera2)
+        y_train_camera2 = np.load(file_y_train_camera2)
+
         authorized = np.load(HISTORY_PATH+"authorized.npy")
 
         vgg_face_model = VGGFace(model='vgg16', include_top=False, input_shape=(224, 224, 3), pooling='avg')
-        for image in images:
-            roi_color = cv2.imread(image)
-            roi_color = cv2.resize(roi_color, (224, 224),interpolation=cv2.INTER_AREA)  # load an image and resize it to 224,224 like vgg face input size
+        count_camera1=1
+        for image_camera1 in self.images_camera1:
+            image_camera1=cv2.cvtColor(image_camera1, cv2.COLOR_BGR2RGB)
+            roi_color = cv2.resize(image_camera1, (224, 224),interpolation=cv2.INTER_AREA)
+            cv2.imwrite(GALLERY_IMAGES_PATH +'Camera1/'+ str(name).capitalize()+'/image'+str(count_camera1)+'.jpg', roi_color)
+            count_camera1+=1  # load an image and resize it to 224,224 like vgg face input size
             roi_color = img_to_array(roi_color)  # convert the image to an array
             roi_color = np.expand_dims(roi_color,  axis=0)
             roi_color = utils.preprocess_input(roi_color, version= 1)  # preprocess the image 1 = vggface resnet = 2)
             feature_vector = vgg_face_model.predict(roi_color)  # extract the features
-            np.shape(feature_vector)
-            feature_vectors.append(feature_vector)#append the current feature vector to the gallery
-            labels.append(str(name))#append the current label to the gallery
+            
+            feature_vectors_camera1.append(feature_vector)#append the current feature vector to the gallery
+            labels_camera1.append(str(name).capitalize())#append the current label to the gallery
 
 
-        feature_vectors = np.squeeze(np.array(feature_vectors), axis=1)
-        labels = np.expand_dims(np.array(labels), axis=1)
-        #exception si fichier n'existe pas np.save else concatenate
-        feature_vectors = np.concatenate((x_train, feature_vectors), axis=0)
-        labels = np.concatenate((y_train, labels), axis=0)
-        data_filename = GALLERY_PATH +'x_train.npy'      
-        labels_filename = GALLERY_PATH +'y_train.npy' 
-        np.save(data_filename, feature_vectors)
-        np.save(labels_filename, labels)
+        feature_vectors_camera1 = np.squeeze(np.array(feature_vectors_camera1), axis=1)
+        feature_vectors_camera1 = np.concatenate((x_train_camera1, feature_vectors_camera1), axis=0)
+        labels_camera1 = np.expand_dims(np.array(labels_camera1), axis=1)
+        labels_camera1 = np.concatenate((y_train_camera1, labels_camera1), axis=0)
+ 
+        np.save(file_x_train_camera1, feature_vectors_camera1)
+        np.save(file_y_train_camera1, labels_camera1)
 
-        authorized = np.append(authorized, name)
+        count_camera2=1
+        for image_camera2 in self.images_camera2:
+            image_camera2=cv2.cvtColor(image_camera2, cv2.COLOR_BGR2RGB)
+            roi_color = cv2.resize(image_camera2, (224, 224),interpolation=cv2.INTER_AREA)
+            cv2.imwrite(GALLERY_IMAGES_PATH +'Camera2/'+ str(name).capitalize()+'/image'+str(count_camera2)+'.jpg', roi_color)
+            count_camera2+=1  # load an image and resize it to 224,224 like vgg face input size
+            roi_color = img_to_array(roi_color)  # convert the image to an array
+            roi_color = np.expand_dims(roi_color,  axis=0)
+            roi_color = utils.preprocess_input(roi_color, version= 1)  # preprocess the image 1 = vggface resnet = 2)
+            feature_vector = vgg_face_model.predict(roi_color)  # extract the features
+            
+            feature_vectors_camera2.append(feature_vector)#append the current feature vector to the gallery
+            labels_camera2.append(str(name).capitalize())#append the current label to the gallery
 
-        print('Saved to : {}/{}'.format(GALLERY_PATH, data_filename))
-        print('Saved to : {}/{}'.format(GALLERY_PATH, labels_filename))
+
+        feature_vectors_camera2 = np.squeeze(np.array(feature_vectors_camera2), axis=1)
+        feature_vectors_camera2 = np.concatenate((x_train_camera2, feature_vectors_camera2), axis=0)
+        labels_camera2 = np.expand_dims(np.array(labels_camera2), axis=1)
+        labels_camera2 = np.concatenate((y_train_camera2, labels_camera2), axis=0)
+ 
+        np.save(file_x_train_camera2, feature_vectors_camera2)
+        np.save(file_y_train_camera2, labels_camera2)
+
+
+
+        authorized = np.append(authorized, str(name).capitalize())
+
+
         self.viewCam()
         #save_vector = np.concatenate((gallery, file_x_train), axis=1)
 

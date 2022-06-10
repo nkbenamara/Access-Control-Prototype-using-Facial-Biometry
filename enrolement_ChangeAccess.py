@@ -86,7 +86,7 @@ class Ui_enrolement_ChangeAccess(object):
             self.label_name.setAlignment(QtCore.Qt.AlignCenter)
             self.label_name.setScaledContents(True)
             
-            path=glob(GALLERY_IMAGES_PATH+ option +"/*")[0]
+            path=glob(GALLERY_IMAGES_PATH+'Camera1/'+ option +"/*")[0]
             face_img = cv2.imread(path)
             height, width, channel = face_img.shape
             step = channel * width
@@ -155,17 +155,10 @@ class Ui_enrolement_ChangeAccess(object):
 
             user_number+=1
 
-        print(self.label_name_objects)
-        print(self.authorization_label_name_objects)
-        print(self.remove_button_name_objects)
-        print(self.grant_button_name_objects)
-
     def Grant(self,person, user_number):
-        print(user_number)
- 
         authorizations = np.load(HISTORY_PATH+'authorized.npy')
         authorizations = np.append(authorizations, str(person))
-        print(authorizations)
+        
         np.save(HISTORY_PATH+'authorized.npy', authorizations)
         self.authorization_label_name_objects[user_number].setText("{}\n Authorized".format(person))
         self.authorization_label_name_objects[user_number].setStyleSheet("color: #ff4b3c;"
@@ -175,19 +168,16 @@ class Ui_enrolement_ChangeAccess(object):
 
 
     def Remove(self, person, user_number):
-        print(user_number)
-
         authorizations = np.load(HISTORY_PATH+'authorized.npy')
         index = np.where(authorizations == person)[0]
-        print(index)
+        
         if person in authorizations:
             authorizations = np.delete(authorizations, index)
             np.save(HISTORY_PATH+'authorized.npy', authorizations)
             self.authorization_label_name_objects[user_number].setText("{}\n Unauthorized ".format(person))
             self.authorization_label_name_objects[user_number].setStyleSheet("color: #ff4b3c;"
-                                                  "font-size: 16px;"
-)
-            print(authorizations)
+                                                  "font-size: 16px;")
+            
         self.remove_button_name_objects[user_number].setVisible(False)
         self.grant_button_name_objects[user_number].setVisible(True)
 

@@ -273,6 +273,7 @@ class Ui_enrolement_addNew(object):
         self.enrolementBTN.setIcon(QIcon("./imgs/scan.png"))
         self.enrolementBTN.setCursor(QCursor(QtCore.Qt.PointingHandCursor))
         self.enrolementBTN.setIconSize(QtCore.QSize(20, 20))
+        self.enrolementBTN.clicked.connect(self.feature_extraction)
 
         font = QtGui.QFont()
         font.setPointSize(12)
@@ -440,21 +441,23 @@ class Ui_enrolement_addNew(object):
             count+=1
 
             time.sleep(2)
-  
+
+        self.class_name_input.setEnabled(True)
+        self.enrolementBTN.setEnabled(True)
+
         self.viewCam()
 
 
 
     def feature_extraction(self):
-        model_type = "vgg16"
 
         name = self.class_name_input.text()
         image_list = []
         feature_vectors = []
         labels = []
         images = glob(GALLERY_IMAGES_PATH + str(name) + "/"+ "*.jpg")
-        file_x_train = GALLERY_PATH+'vgg16_x_train.npy'
-        file_y_train = GALLERY_PATH+'vgg16_y_train.npy'
+        file_x_train = GALLERY_PATH+'x_train.npy'
+        file_y_train = GALLERY_PATH+'y_train.npy'
         x_train = np.load(file_x_train)
         y_train = np.load(file_y_train)
         authorized = np.load(HISTORY_PATH+"authorized.npy")
@@ -477,8 +480,8 @@ class Ui_enrolement_addNew(object):
         #exception si fichier n'existe pas np.save else concatenate
         feature_vectors = np.concatenate((x_train, feature_vectors), axis=0)
         labels = np.concatenate((y_train, labels), axis=0)
-        data_filename = GALLERY_PATH + str(model_type) + '_x_train.npy'      
-        labels_filename = GALLERY_PATH + str(model_type) + '_y_train.npy' 
+        data_filename = GALLERY_PATH +'x_train.npy'      
+        labels_filename = GALLERY_PATH +'y_train.npy' 
         np.save(data_filename, feature_vectors)
         np.save(labels_filename, labels)
 

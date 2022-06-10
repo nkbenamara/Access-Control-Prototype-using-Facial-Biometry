@@ -183,7 +183,7 @@ class Ui_Dashboard_Ui(object):
 
         self.retranslateUi(Dashboard_Ui)
         QtCore.QMetaObject.connectSlotsByName(Dashboard_Ui)
-        donutGenerator(GALLERY_PATH+"vgg16_y_train.npy",STAT_PATH+"img.png")
+        donutGenerator(GALLERY_PATH+"y_train.npy",STAT_PATH+"img.png")
         donutGenerator(HISTORY_PATH+"access_history.npy",STAT_PATH+"img2.png")
         donutGenerator(HISTORY_PATH+"accessTime_history.npy",STAT_PATH+"img3.png")
         self.classCount()
@@ -191,7 +191,7 @@ class Ui_Dashboard_Ui(object):
 
 
     def classCount(self):
-        y_train = np.load(GALLERY_PATH+"vgg16_y_train.npy")
+        y_train = np.load(GALLERY_PATH+"y_train.npy")
 
         #data = np.unique(y_train, return_counts=True)[1]
         class_count = np.shape(np.unique(y_train, return_counts=True)[0])[0]

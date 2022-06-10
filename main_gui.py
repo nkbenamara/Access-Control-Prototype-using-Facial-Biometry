@@ -439,14 +439,9 @@ class Ui_MainWindow(object):
         self.retranslateUi(MainWindow)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
 
-
-        
         
         self.camera_labels=[self.cam_label1, self.cam_label2]
         self.face_frames=[self.face_frame1, self.face_frame2]
-
-        #delete_personel("vgg16", "Djamel Hemch")
-        #reinteger_all("vgg16")
 
 
     """
@@ -647,8 +642,11 @@ class Ui_MainWindow(object):
                 break
     
     def stopVideo(self):
-        self.capture1.release()
-        self.capture2.release()
+        try : 
+            self.capture1.release()
+            self.capture2.release()
+        except:
+            pass
         self.take_pic.setEnabled(False)
         self.Camera_Stopped_1.setVisible(True)
         self.Camera_Stopped_2.setVisible(True)
@@ -691,8 +689,8 @@ class Ui_MainWindow(object):
             except:
                 pass
             
-            x_train = np.load(GALLERY_PATH+"vgg16_x_train.npy")
-            y_train = np.load(GALLERY_PATH+"vgg16_y_train.npy")
+            x_train = np.load(GALLERY_PATH+"x_train.npy")
+            y_train = np.load(GALLERY_PATH+"y_train.npy")
 
             roi_color1 = cv2.resize(roi_color1, (224, 224),interpolation= cv2.INTER_AREA)  # load an image and resize it to 224,224 like vgg face input size
             roi_color1 = img_to_array(roi_color1)  # convert the image to an array

@@ -59,7 +59,7 @@ class Ui_enrolement_ChangeAccess(object):
   
         authorizations = np.load(HISTORY_PATH+'authorized.npy')
 
-        options = load_actual_collaborators("vgg16")
+        options = load_actual_collaborators()
         user_number=1
         #instantiate multiple label/buttons objects with a loop (TO SOLVE !!!!!!!!!!!!!!!)
 

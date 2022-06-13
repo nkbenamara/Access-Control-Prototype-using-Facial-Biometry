@@ -103,6 +103,31 @@ class Ui_enrolement_addNew(object):
                                      )
         self.No_Face_2.setAlignment(QtCore.Qt.AlignCenter)
         self.No_Face_2.setVisible(False)
+
+        #Stopped Camera Area 1 
+        self.Camera_Stopped_1 = QtWidgets.QLabel(self.centralwidget)
+        self.Camera_Stopped_1.setGeometry(QtCore.QRect(140, 175, 150, 50))
+        self.Camera_Stopped_1.setObjectName("Camera_Stopped_1")
+        self.Camera_Stopped_1.setFont(font15)
+        self.Camera_Stopped_1.setStyleSheet("background-color:rgba(255,75,60,200);"
+                                    "color: white;"
+                                     "font-style:bold;"
+                                     )
+        self.Camera_Stopped_1.setAlignment(QtCore.Qt.AlignCenter)
+        self.Camera_Stopped_1.setVisible(False)
+        
+        #Stopped Camera Area 2
+        self.Camera_Stopped_2 = QtWidgets.QLabel(self.centralwidget)
+        self.Camera_Stopped_2.setGeometry(QtCore.QRect(575, 175, 150, 50))
+        self.Camera_Stopped_2.setObjectName("Camera_Stopped_2")
+        self.Camera_Stopped_2.setFont(font15)
+        self.Camera_Stopped_2.setStyleSheet("background-color:rgba(255,75,60,200);"
+                                    "color: white;"
+                                     "font-style:bold;"
+                                     )
+        self.Camera_Stopped_2.setAlignment(QtCore.Qt.AlignCenter)
+        self.Camera_Stopped_2.setVisible(False)
+
         #Taken Picture Areas 
         #Frame 1_1 (Main Frame 1)
         self.face_frame1_1 = QtWidgets.QLabel(self.centralwidget)
@@ -208,10 +233,10 @@ class Ui_enrolement_addNew(object):
 
 
         #Start Recording Button
-        self.startBTN = QtWidgets.QPushButton(self.centralwidget)
-        self.startBTN.setGeometry(QtCore.QRect(285, 450, 142, 40))
-        self.startBTN.setFont(font7)
-        self.startBTN.setStyleSheet(
+        self.recordBTN = QtWidgets.QPushButton(self.centralwidget)
+        self.recordBTN.setGeometry(QtCore.QRect(285, 450, 142, 40))
+        self.recordBTN.setFont(font7)
+        self.recordBTN.setStyleSheet(
             "QPushButton::hover"
                              "{"
                              "background-color:rgb(255,255,255);"
@@ -219,12 +244,33 @@ class Ui_enrolement_addNew(object):
                              "}"
                             "border: 1px solid white;"
         )
-        self.startBTN.setIcon(QIcon("./imgs/start.ico"))
-        self.startBTN.setIconSize(QtCore.QSize(20, 20))
-        self.startBTN.setShortcut('Ctrl+R')
-        self.startBTN.setCursor(QCursor(QtCore.Qt.PointingHandCursor))
-        self.startBTN.setObjectName("startBTN")
-        self.startBTN.clicked.connect(self.viewCam)
+        self.recordBTN.setIcon(QIcon("./imgs/start.ico"))
+        self.recordBTN.setIconSize(QtCore.QSize(20, 20))
+        self.recordBTN.setShortcut('Ctrl+R')
+        self.recordBTN.setCursor(QCursor(QtCore.Qt.PointingHandCursor))
+        self.recordBTN.setObjectName("recordBTN")
+        self.recordBTN.clicked.connect(self.viewCam)
+
+        #Stop Record Button 1
+        self.stopBTN = QtWidgets.QPushButton(self.centralwidget)
+        self.stopBTN.setGeometry(QtCore.QRect(285, 450, 142, 40))
+        self.stopBTN.setFont(font7)
+        self.stopBTN.setStyleSheet(
+                                "QPushButton::hover"
+                             "{"
+                             "background-color:rgb(255,255,255);"
+                            "color: black;"
+                             "}"
+                            "border: 1px solid white;"
+                            )
+        self.stopBTN.setIcon(QIcon("./imgs/stop.png"))
+        self.stopBTN.setIconSize(QtCore.QSize(20, 20))
+        self.stopBTN.setShortcut('Ctrl+S')
+        self.stopBTN.setToolTip("Stop Recording")  # Tool tip
+        self.stopBTN.setCursor(QCursor(QtCore.Qt.PointingHandCursor))
+        self.stopBTN.setObjectName("stopBTN")
+        self.stopBTN.setVisible(False)
+        self.stopBTN.clicked.connect(self.stopVideo)
 
         #Capture Button
         self.take_pic = QtWidgets.QPushButton(self.centralwidget)
@@ -274,21 +320,9 @@ class Ui_enrolement_addNew(object):
         self.enrolementBTN.setCursor(QCursor(QtCore.Qt.PointingHandCursor))
         self.enrolementBTN.setIconSize(QtCore.QSize(20, 20))
         self.enrolementBTN.clicked.connect(self.feature_extraction)
-
-        font = QtGui.QFont()
-        font.setPointSize(12)
-
-        self.enrolementBTN.setFont(font)
+        self.enrolementBTN.setFont(font7)
         self.enrolementBTN.setToolTip("Starts feature extraction")
 
-        self.notif = QtWidgets.QLabel(self.centralwidget)
-        self.notif.setGeometry(QtCore.QRect(600, 18, 265, 21))
-        self.notif.setObjectName("notif")
-
-        font = QtGui.QFont()
-        font.setPointSize(15)
-
-        self.notif.setFont(font)
 
 
         enrolement_addNew.setCentralWidget(self.centralwidget)
@@ -317,89 +351,107 @@ class Ui_enrolement_addNew(object):
         self.capture2 = cv2.VideoCapture(0)
         self.cameras=[self.capture1, self.capture2]
 
-        while hasattr(self.capture1, 'read'):
+        self.recordBTN.setVisible(False)
+        self.stopBTN.setVisible(True)
+        self.Camera_Stopped_1.setVisible(False)
+        self.Camera_Stopped_2.setVisible(False)
+        try:
+            while hasattr(self.capture1, 'read'):
 
-            ret1, frame1 = self.cameras[0].read()
-            ret2, frame2 = self.cameras[1].read()
+                ret1, frame1 = self.cameras[0].read()
+                ret2, frame2 = self.cameras[1].read()
 
 
-            gray1 = cv2.cvtColor(frame1, cv2.COLOR_BGR2GRAY)
-            gray2 = cv2.cvtColor(frame2, cv2.COLOR_BGR2GRAY)
+                gray1 = cv2.cvtColor(frame1, cv2.COLOR_BGR2GRAY)
+                gray2 = cv2.cvtColor(frame2, cv2.COLOR_BGR2GRAY)
 
-            rects1 = detector(gray1, 0)
-            rects2 = detector(gray2, 0)
+                rects1 = detector(gray1, 0)
+                rects2 = detector(gray2, 0)
+                    
+                image1= cv2.cvtColor(frame1, cv2.COLOR_BGR2RGB)
+                image2= cv2.cvtColor(frame2, cv2.COLOR_BGR2RGB)
+        
+                height1, width1, channel1 = image1.shape
+                height2, width2, channel2 = image2.shape
+
+                step1 = channel1 * width1
+                step2 = channel2 * width2
+
+                qImg1 = QImage(image1.data, width1, height1, step1, QImage.Format_RGB888)
+                qImg2 = QImage(image2.data, width2, height2, step2, QImage.Format_RGB888)
                 
-            image1= cv2.cvtColor(frame1, cv2.COLOR_BGR2RGB)
-            image2= cv2.cvtColor(frame2, cv2.COLOR_BGR2RGB)
-     
-            height1, width1, channel1 = image1.shape
-            height2, width2, channel2 = image2.shape
+                # Draw a rectangle around the faces (Camera 1)
+                if len(rects1)!=0:
+                    self.No_Face_1.setVisible(True)
+                    self.No_Face_1.setStyleSheet(
+                                            "background-color:rgba(3,174,80,200);"
+                                            "font-style:bold;"
+                                            "color: white;"
+                                            )
+                    self.No_Face_1.setText("Face Detected")
+                    
+                    for rect1 in rects1: 
+                        x1,y1,w1,h1= convert_and_trim_bb(gray1, rect1) 
+                        cv2.rectangle(image1, (x1, y1), (x1 + w1, y1 + h1), (255, 0, 0), 2)
+                else:
+                    self.No_Face_1.setStyleSheet(
+                                            "background-color:rgba(255,75,60,200);"
+                                            "font-style:bold;"
+                                            "color: white;"
+                                            )
+                    self.No_Face_1.setText("No Face Detected")
+                    self.No_Face_1.setVisible(True)
 
-            step1 = channel1 * width1
-            step2 = channel2 * width2
+                # Draw a rectangle around the faces (Camera 2)
+                if len(rects2)!=0:
+                    self.No_Face_2.setVisible(True)
+                    self.No_Face_2.setStyleSheet(
+                                            "background-color:rgba(3,174,80,200);"
+                                            "font-style:bold;"
+                                            "color: white;"
+                                            )
+                    self.No_Face_2.setText("Face Detected")
 
-            qImg1 = QImage(image1.data, width1, height1, step1, QImage.Format_RGB888)
-            qImg2 = QImage(image2.data, width2, height2, step2, QImage.Format_RGB888)
-            
-            # Draw a rectangle around the faces (Camera 1)
-            if len(rects1)!=0:
-                self.No_Face_1.setVisible(True)
-                self.No_Face_1.setStyleSheet(
-                                        "background-color:rgba(3,174,80,200);"
-                                        "font-style:bold;"
-                                        "color: white;"
-                                        )
-                self.No_Face_1.setText("Face Detected")
+                    for rect2 in rects2:
+                        x2,y2,w2,h2= convert_and_trim_bb(gray2, rect2) 
+                        cv2.rectangle(image2, (x2, y2), (x2 + w2, y2 + h2), (0, 255, 0), 2)
+                else:
+                    self.No_Face_2.setStyleSheet(
+                                            "background-color:rgba(255,75,60,200);"
+                                            "font-style:bold;"
+                                            "color: white;"
+                                            )
+                    self.No_Face_2.setText("No Face Detected")
+                    self.No_Face_2.setVisible(True)
+
+                if len(rects1)!=0 and len(rects2)!=0:
+                    self.take_pic.setEnabled(True)
+                else:
+                    self.take_pic.setEnabled(False) 
+
+                self.camera_labels[0].setPixmap(QPixmap.fromImage(qImg1))
+                self.camera_labels[1].setPixmap(QPixmap.fromImage(qImg2))
                 
-                for rect1 in rects1: 
-                    x1,y1,w1,h1= convert_and_trim_bb(gray1, rect1) 
-                    cv2.rectangle(image1, (x1, y1), (x1 + w1, y1 + h1), (255, 0, 0), 2)
-            else:
-                self.No_Face_1.setStyleSheet(
-                                        "background-color:rgba(255,75,60,200);"
-                                        "font-style:bold;"
-                                        "color: white;"
-                                        )
-                self.No_Face_1.setText("No Face Detected")
-                self.No_Face_1.setVisible(True)
-
-            # Draw a rectangle around the faces (Camera 2)
-            if len(rects2)!=0:
-                self.No_Face_2.setVisible(True)
-                self.No_Face_2.setStyleSheet(
-                                        "background-color:rgba(3,174,80,200);"
-                                        "font-style:bold;"
-                                        "color: white;"
-                                        )
-                self.No_Face_2.setText("Face Detected")
-
-                for rect2 in rects2:
-                    x2,y2,w2,h2= convert_and_trim_bb(gray2, rect2) 
-                    cv2.rectangle(image2, (x2, y2), (x2 + w2, y2 + h2), (0, 255, 0), 2)
-            else:
-                self.No_Face_2.setStyleSheet(
-                                        "background-color:rgba(255,75,60,200);"
-                                        "font-style:bold;"
-                                        "color: white;"
-                                        )
-                self.No_Face_2.setText("No Face Detected")
-                self.No_Face_2.setVisible(True)
-
-            if len(rects1)!=0 and len(rects2)!=0:
-                self.take_pic.setEnabled(True)
-            else:
-                self.take_pic.setEnabled(False) 
-
-            self.camera_labels[0].setPixmap(QPixmap.fromImage(qImg1))
-            self.camera_labels[1].setPixmap(QPixmap.fromImage(qImg2))
-            
-                            # Draw a rectangle around the faces (Camera 1)
+                                # Draw a rectangle around the faces (Camera 1)
 
 
-            if cv2.waitKey(0) & 0xFF == ord('z'):
-                break
-
-
+                if cv2.waitKey(0) & 0xFF == ord('z'):
+                    break
+        except: 
+            pass
+    def stopVideo(self):
+        try : 
+            self.capture1.release()
+            self.capture2.release()
+        except:
+            pass
+        self.take_pic.setEnabled(False)
+        self.Camera_Stopped_1.setVisible(True)
+        self.Camera_Stopped_2.setVisible(True)
+        self.No_Face_1.setVisible(False)
+        self.No_Face_2.setVisible(False)
+        self.recordBTN.setVisible(True)
+        self.stopBTN.setVisible(False)
 
 
     def capture_image(self):
@@ -553,9 +605,11 @@ class Ui_enrolement_addNew(object):
         self.face_frame2_4.setText(_translate("MainWindow", "Image \n 4"))
         self.face_frame2_5.setText(_translate("MainWindow", "Image \n 5"))
         self.take_pic.setText(_translate("enrolement_addNew", "Take Pictures"))
-        self.startBTN.setText(_translate("enrolement_addNew", "Open Camera"))
+        self.recordBTN.setText(_translate("enrolement_addNew", "Open Cameras"))
+        self.stopBTN.setText(_translate("MainWindow", "Stop Cameras"))
+        self.Camera_Stopped_1.setText(_translate("MainWindow", "Camera 1 \n Stopped"))
+        self.Camera_Stopped_2.setText(_translate("MainWindow", "Camera 2 \n Stopped"))
         self.enrolementBTN.setText(_translate("enrolement_addNew", "Enroll"))
-        self.notif.setText(_translate("enrolement_addNew", ""))
 
 
 if __name__ == "__main__":

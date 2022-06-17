@@ -294,7 +294,7 @@ class Ui_enrolement_addNew(object):
         
         #NameText (Class Name Input)
         self.class_name_input = QtWidgets.QLineEdit(self.centralwidget)
-        self.class_name_input.setGeometry(QtCore.QRect(330, 700, 200, 30))
+        self.class_name_input.setGeometry(QtCore.QRect(650, 700, 185, 30))
         self.class_name_input.setEnabled(False)
         self.class_name_input.setPlaceholderText('Enroll As (Last Name)')
         self.class_name_input.setStyleSheet("border: 1px solid white;"
@@ -303,9 +303,9 @@ class Ui_enrolement_addNew(object):
                                     "color: rgb(0,0,0);"
                       )
 
-
+        #Enrollement Button
         self.enrolementBTN = QtWidgets.QPushButton(self.centralwidget)
-        self.enrolementBTN.setGeometry(QtCore.QRect(345, 745, 170, 40))
+        self.enrolementBTN.setGeometry(QtCore.QRect(670, 745, 145, 40))
         self.enrolementBTN.setEnabled(False)
         self.enrolementBTN.setObjectName("Enrolement Boutton")
         self.enrolementBTN.setStyleSheet(
@@ -323,9 +323,38 @@ class Ui_enrolement_addNew(object):
         self.enrolementBTN.setFont(font7)
         self.enrolementBTN.setToolTip("Starts feature extraction")
 
+        #Subject Verification 1
+        self.subject_verification1 = QtWidgets.QLabel(self.centralwidget)
+        self.subject_verification1.setGeometry(QtCore.QRect(30, 700, 185, 70))
+        self.subject_verification1.setObjectName("subject_verification")
+        self.subject_verification1.setAlignment(QtCore.Qt.AlignCenter)
+        self.subject_verification1.setStyleSheet("border: 1px solid white;"
+                                     "font-style:bold;"
+                                     "font-size: 13px"
+                                     )   
+        #Subject Verification 2
+        self.subject_verification2 = QtWidgets.QLabel(self.centralwidget)
+        self.subject_verification2.setGeometry(QtCore.QRect(230, 700, 185, 70))
+        self.subject_verification2.setObjectName("subject_verification")
+        self.subject_verification2.setAlignment(QtCore.Qt.AlignCenter)
+        self.subject_verification2.setStyleSheet("border: 1px solid white;"
+                                     "font-style:bold;"
+                                     "font-size: 13px"
+                                     )   
 
+        #Verification Status
+        self.status_verification = QtWidgets.QLabel(self.centralwidget)
+        self.status_verification.setGeometry(QtCore.QRect(450, 700, 185, 70))
+        self.status_verification.setObjectName("status_verification")
+        self.status_verification.setAlignment(QtCore.Qt.AlignCenter)
+        self.status_verification.setStyleSheet("border: 1px solid white;"
+                                     "font-style:bold;"
+                                     "font-size: 13px"
+                                     )   
 
         enrolement_addNew.setCentralWidget(self.centralwidget)
+
+
         self.menubar = QtWidgets.QMenuBar(enrolement_addNew)
         self.menubar.setGeometry(QtCore.QRect(0, 0, 803, 21))
         self.menubar.setObjectName("menubar")
@@ -462,6 +491,12 @@ class Ui_enrolement_addNew(object):
         self.images_camera2=[]
         count = 0
 
+        x_train_camera1 = np.load(GALLERY_PATH+"x_train_camera1.npy")
+        y_train_camera1 = np.load(GALLERY_PATH+"y_train_camera1.npy")
+
+        x_train_camera2 = np.load(GALLERY_PATH+"x_train_camera2.npy")
+        y_train_camera2 = np.load(GALLERY_PATH+"y_train_camera2.npy")
+
         while True and count <5:
 
             ret1, frame1 = self.cameras[0].read()
@@ -498,6 +533,26 @@ class Ui_enrolement_addNew(object):
 
             time.sleep(2)
 
+       
+
+        roi_color1 = cv2.resize(roi_color1, (224, 224),interpolation= cv2.INTER_AREA)  # load an image and resize it to 224,224 like vgg face input size
+        roi_color1 = img_to_array(roi_color1)  # convert the image to an array
+        roi_color1 = np.expand_dims(roi_color1,axis=0)  # add the 4th dimension as a tensor to inject through the vgg face network
+        roi_color1 = utils.preprocess_input(roi_color1, version= 1)  # preprocess the image 1 = vggface resnet = 2)
+        feature_vector1 = vgg_face_model.predict(roi_color1)  # extract the features
+        face_prediction1 = prediction_cosine_similarity2(x_train_camera1, y_train_camera1, feature_vector1, 5)[0]
+
+        self.subject_verification1.setText("Camera 1 Verification \n {}".format(face_prediction1))
+        
+        roi_color2 = cv2.resize(roi_color2, (224, 224),interpolation= cv2.INTER_AREA)  # load an image and resize it to 224,224 like vgg face input size
+        roi_color2 = img_to_array(roi_color2)  # convert the image to an array
+        roi_color2 = np.expand_dims(roi_color2,axis=0)  # add the 4th dimension as a tensor to inject through the vgg face network
+        roi_color2 = utils.preprocess_input(roi_color2, version= 1)  # preprocess the image 1 = vggface resnet = 2)
+        feature_vector2 = vgg_face_model.predict(roi_color2)  # extract the features
+        face_prediction2 = prediction_cosine_similarity2(x_train_camera2, y_train_camera2, feature_vector2, 5)[0]
+
+        self.subject_verification2.setText("Camera 2 Verification \n {}".format(face_prediction2))
+        
         self.class_name_input.setEnabled(True)
         self.enrolementBTN.setEnabled(True)
 
@@ -610,7 +665,9 @@ class Ui_enrolement_addNew(object):
         self.Camera_Stopped_1.setText(_translate("MainWindow", "Camera 1 \n Stopped"))
         self.Camera_Stopped_2.setText(_translate("MainWindow", "Camera 2 \n Stopped"))
         self.enrolementBTN.setText(_translate("enrolement_addNew", "Enroll"))
-
+        self.subject_verification1.setText(_translate("MainWindow", "Camera 1 Verification"))
+        self.subject_verification2.setText(_translate("MainWindow", "Camera 2 Verification"))
+        self.status_verification.setText(_translate("MainWindow", "Verification Status"))
 
 if __name__ == "__main__":
     import sys

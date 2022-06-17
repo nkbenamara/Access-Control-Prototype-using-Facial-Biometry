@@ -48,7 +48,7 @@ class Ui_enrolement_addNew(object):
 
         #Main Window
         enrolement_addNew.setObjectName("enrolement_addNew")
-        enrolement_addNew.resize(860, 830)
+        enrolement_addNew.resize(860, 860)
         enrolement_addNew.setStyleSheet("background-color: #1b1553;"
         "color: #ff4b3c;"
         "font-family: Play;"
@@ -323,6 +323,24 @@ class Ui_enrolement_addNew(object):
         self.enrolementBTN.setFont(font7)
         self.enrolementBTN.setToolTip("Starts feature extraction")
 
+        #Enrollement Button
+        self.exitBTN = QtWidgets.QPushButton(self.centralwidget)
+        self.exitBTN.setGeometry(QtCore.QRect(670, 795, 145, 40))
+        self.exitBTN.setEnabled(False)
+        self.exitBTN.setObjectName("Exit Boutton")
+        self.exitBTN.setStyleSheet(
+            "QPushButton::hover"
+            "{"
+            "background-color:rgb(255,255,255);"
+            "color: black;"
+            "}"
+            "border: 1px solid white;"
+        )
+        self.exitBTN.setIcon(QIcon("./imgs/scan.png"))
+        self.exitBTN.setCursor(QCursor(QtCore.Qt.PointingHandCursor))
+        self.exitBTN.setIconSize(QtCore.QSize(20, 20))
+        self.exitBTN.setFont(font7)
+
         #Subject Verification 1
         self.subject_verification1 = QtWidgets.QLabel(self.centralwidget)
         self.subject_verification1.setGeometry(QtCore.QRect(30, 700, 185, 70))
@@ -351,6 +369,59 @@ class Ui_enrolement_addNew(object):
                                      "font-style:bold;"
                                      "font-size: 13px"
                                      )   
+
+        #dashed border 
+        self.dashed_border = QtWidgets.QLabel(self.centralwidget)
+        self.dashed_border.setGeometry(QtCore.QRect(30, 800, 605, 2))
+        self.dashed_border.setObjectName("status_verification")
+        self.dashed_border.setAlignment(QtCore.Qt.AlignCenter)
+        self.dashed_border.setStyleSheet("border-top: 2px solid white;"
+                                        "border-style: dashed;"
+                                     "font-style:bold;"
+                                     "font-size: 13px"
+                                     ) 
+        #valid_camera_1
+        self.valid_camera_1 = QtWidgets.QLabel(self.centralwidget)
+        self.valid_camera_1.setGeometry(QtCore.QRect(130, 780, 40, 40))
+        self.valid_camera_1.setObjectName("valid_camera_1")
+        self.valid_camera_1.setAlignment(QtCore.Qt.AlignCenter)
+        self.valid_camera_1.setVisible(False)
+
+        #valid_camera_1 Image
+        self.valid_camera_1_image = QtWidgets.QLabel(self.centralwidget)
+        self.valid_camera_1_image.setGeometry(QtCore.QRect(80, 780, 50, 50))
+        self.valid_camera_1_image.setObjectName("valid_camera_1_image")
+        self.valid_camera_1_image.setAlignment(QtCore.Qt.AlignCenter)
+        self.valid_camera_1_image.setVisible(False)
+
+        #valid_camera_2
+        self.valid_camera_2 = QtWidgets.QLabel(self.centralwidget)
+        self.valid_camera_2.setGeometry(QtCore.QRect(330, 780, 40, 40))
+        self.valid_camera_2.setObjectName("valid_camera_2")
+        self.valid_camera_2.setAlignment(QtCore.Qt.AlignCenter)
+        self.valid_camera_2.setVisible(False)
+
+        #valid_camera_2 Image
+        self.valid_camera_2_image = QtWidgets.QLabel(self.centralwidget)
+        self.valid_camera_2_image.setGeometry(QtCore.QRect(280, 780, 50, 50))
+        self.valid_camera_2_image.setObjectName("valid_camera_2_image")
+        self.valid_camera_2_image.setAlignment(QtCore.Qt.AlignCenter)
+        self.valid_camera_2_image.setVisible(False)
+
+        #valid_both_cameras
+        self.valid_both_cameras = QtWidgets.QLabel(self.centralwidget)
+        self.valid_both_cameras.setGeometry(QtCore.QRect(550, 780, 40, 40))
+        self.valid_both_cameras.setObjectName("valid_both_cameras")
+        self.valid_both_cameras.setAlignment(QtCore.Qt.AlignCenter)
+        self.valid_both_cameras.setVisible(False)
+
+        #valid_both_cameras Image
+        self.valid_both_cameras_image = QtWidgets.QLabel(self.centralwidget)
+        self.valid_both_cameras_image.setGeometry(QtCore.QRect(500, 780, 50, 50))
+        self.valid_both_cameras_image.setObjectName("valid_both_cameras_image")
+        self.valid_both_cameras_image.setAlignment(QtCore.Qt.AlignCenter)
+        self.valid_both_cameras_image.setVisible(False)
+
 
         enrolement_addNew.setCentralWidget(self.centralwidget)
 
@@ -512,10 +583,14 @@ class Ui_enrolement_addNew(object):
             for rect1 in rects1:
                 x1,y1,w1,h1= convert_and_trim_bb(gray1, rect1)
                 roi_color1 = frame1[y1:y1 + h1, x1:x1 + w1]
+                if count==0:
+                    image_validation_1=roi_color1
                 
             for rect2 in rects2:
                 x2,y2,w2,h2= convert_and_trim_bb(gray2, rect2)
                 roi_color2 = frame2[y2:y2 + h2, x2:x2 + w2]
+                if count==0:
+                    image_validation_2=roi_color2
                     
             
             img1=cv2.cvtColor(roi_color1, cv2.COLOR_BGR2RGB)
@@ -533,7 +608,18 @@ class Ui_enrolement_addNew(object):
 
             time.sleep(2)
 
-       
+        self.valid_camera_1.setVisible(True)
+        self.valid_camera_2.setVisible(True)
+        self.valid_both_cameras.setVisible(True)
+
+        self.valid_camera_1_image.setVisible(True)
+        self.valid_camera_1_image.setStyleSheet("border: 1px solid white")
+
+        self.valid_camera_2_image.setVisible(True)
+        self.valid_camera_2_image.setStyleSheet("border: 1px solid white")
+
+        self.valid_both_cameras_image.setVisible(True)
+        self.valid_both_cameras_image.setStyleSheet("border: 1px solid white")
 
         roi_color1 = cv2.resize(roi_color1, (224, 224),interpolation= cv2.INTER_AREA)  # load an image and resize it to 224,224 like vgg face input size
         roi_color1 = img_to_array(roi_color1)  # convert the image to an array
@@ -543,7 +629,20 @@ class Ui_enrolement_addNew(object):
         face_prediction1 = prediction_cosine_similarity2(x_train_camera1, y_train_camera1, feature_vector1, 5)[0]
 
         self.subject_verification1.setText("Camera 1 Verification \n {}".format(face_prediction1))
-        
+
+        image_validation_1 = cv2.resize(image_validation_1, (50,50), interpolation=cv2.INTER_AREA)
+        image_validation_1=cv2.cvtColor(image_validation_1, cv2.COLOR_BGR2RGB)
+
+        image_validation_1 = QImage(image_validation_1,50, 50, 3*50, QImage.Format_RGB888)
+        self.valid_camera_1_image.setPixmap(QPixmap.fromImage(image_validation_1))
+
+        if face_prediction1=="Not Recognized":
+            self.valid_camera_1.setPixmap(QPixmap("./imgs/valid.png"))
+            self.subject_verification1.setStyleSheet("color:rgb(3,174,80)")
+        else: 
+            self.valid_camera_1.setPixmap(QPixmap("./imgs/not_valid.png"))
+            self.subject_verification1.setStyleSheet("color:rgb(255,75,60)")
+
         roi_color2 = cv2.resize(roi_color2, (224, 224),interpolation= cv2.INTER_AREA)  # load an image and resize it to 224,224 like vgg face input size
         roi_color2 = img_to_array(roi_color2)  # convert the image to an array
         roi_color2 = np.expand_dims(roi_color2,axis=0)  # add the 4th dimension as a tensor to inject through the vgg face network
@@ -552,6 +651,41 @@ class Ui_enrolement_addNew(object):
         face_prediction2 = prediction_cosine_similarity2(x_train_camera2, y_train_camera2, feature_vector2, 5)[0]
 
         self.subject_verification2.setText("Camera 2 Verification \n {}".format(face_prediction2))
+
+        image_validation_2 = cv2.resize(image_validation_2, (50,50), interpolation=cv2.INTER_AREA)
+        image_validation_2=cv2.cvtColor(image_validation_2, cv2.COLOR_BGR2RGB)
+
+        image_validation_2 = QImage(image_validation_2,50, 50, 3*50, QImage.Format_RGB888)
+        self.valid_camera_2_image.setPixmap(QPixmap.fromImage(image_validation_2))
+
+
+        if face_prediction2=="Not Recognized":
+            self.valid_camera_2.setPixmap(QPixmap("./imgs/valid.png"))
+            self.subject_verification2.setStyleSheet("color:rgb(3,174,80)")
+        else: 
+            self.valid_camera_2.setPixmap(QPixmap("./imgs/not_valid.png"))
+            self.subject_verification2.setStyleSheet("color:rgb(255,75,60)")
+        
+        if (face_prediction1 == 'Not Recognized' and face_prediction2 == 'Not Recognized') :
+            self.valid_both_cameras.setPixmap(QPixmap("./imgs/valid.png"))
+            self.valid_both_cameras_image.setPixmap(QPixmap("./imgs/unkown_verification.png"))
+            self.status_verification.setText("Verification Status \n Ready to Enroll")
+            self.status_verification.setStyleSheet("color:rgb(3,174,80)")
+        elif (face_prediction1!=face_prediction2) and (face_prediction1 == 'Not Recognized' or face_prediction2 == 'Not Recognized'):
+            self.valid_both_cameras.setPixmap(QPixmap("./imgs/not_valid.png"))
+            self.valid_both_cameras_image.setPixmap(QPixmap("./imgs/unkown_verification.png"))
+            self.status_verification.setText("Verification Status \n Failed")
+            self.status_verification.setStyleSheet("color:rgb(255,75,60)")
+        else:  
+            images=glob("./gallery_images/Camera2/"+face_prediction1+"/*")
+            class_image=cv2.imread(images[0])
+            class_image=cv2.cvtColor(class_image, cv2.COLOR_BGR2RGB)
+            class_image=cv2.resize(class_image, (50,50), interpolation=cv2.INTER_AREA)
+            class_image = QImage(class_image,50, 50, 3*50, QImage.Format_RGB888)
+            self.valid_both_cameras_image.setPixmap(QPixmap(class_image))
+            self.valid_both_cameras.setPixmap(QPixmap("./imgs/not_valid.png"))
+            self.status_verification.setText("Verification Status \n Already Enrolled")
+            self.status_verification.setStyleSheet("color:rgb(255,75,60)")
         
         self.class_name_input.setEnabled(True)
         self.enrolementBTN.setEnabled(True)
@@ -665,6 +799,7 @@ class Ui_enrolement_addNew(object):
         self.Camera_Stopped_1.setText(_translate("MainWindow", "Camera 1 \n Stopped"))
         self.Camera_Stopped_2.setText(_translate("MainWindow", "Camera 2 \n Stopped"))
         self.enrolementBTN.setText(_translate("enrolement_addNew", "Enroll"))
+        self.exitBTN.setText(_translate("enrolement_addNew", "Exit"))
         self.subject_verification1.setText(_translate("MainWindow", "Camera 1 Verification"))
         self.subject_verification2.setText(_translate("MainWindow", "Camera 2 Verification"))
         self.status_verification.setText(_translate("MainWindow", "Verification Status"))

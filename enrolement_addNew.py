@@ -48,7 +48,7 @@ class Ui_enrolement_addNew(object):
 
         #Main Window
         enrolement_addNew.setObjectName("enrolement_addNew")
-        enrolement_addNew.resize(860, 860)
+        enrolement_addNew.setFixedSize(860, 860)
         enrolement_addNew.setStyleSheet("background-color: #1b1553;"
         "color: #ff4b3c;"
         "font-family: Play;"
